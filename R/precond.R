@@ -1,4 +1,6 @@
-# TODO: Add SOR iteration process
+# TODO: 
+#  1) Add SOR preconditioner
+#  2) Rewrite minimal residuals method
 ###############################################################################
 
 #' @description methods of solving differential schemes
@@ -64,16 +66,11 @@ slv <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5, ma
     it <-it - 1
     
     r <- f - A%*%x0
-    #message("r ", r, "\n")
     delta <- solve(P)%*%r
     
     #minimal residuals method
     if (tao.compute){
       tao <- as.double(crossprod(A%*%r, r)/crossprod(A%*%r, A%*%r))
-      #print(A%*%r)
-      #print(crossprod(A%*%r, r))
-      print(crossprod(A%*%r, A%*%r))
-      #message("Tao", tao)
     }
     
     x <- x0 + tao*delta
