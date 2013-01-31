@@ -120,10 +120,10 @@ diff_method <- function(n.c, precision){
 	M[dd2] <- diags$d3
 	M[dd3] <- diags$d1
   
-  #it's demonstration that matrix isn't strongly diagonal dominant
-  View(M)
+  source("R/TDMA.R")
   
-	return (solve(M, f))
+	#return (solve(M, f))
+  return (TDMA(diags$d1, diags$d2, diags$d3, f))
 }
 
 test <- function(){
