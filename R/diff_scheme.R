@@ -9,8 +9,10 @@
 #
 #			x from interval [a, b]
 # 
-# Author: ?????
+#' @author Anton Shamin 
 ###############################################################################
+
+source("R/TDMA.R")
 
 #derivative equation coefficients A(x), B(x), C(x)
 A <- function(x){
@@ -109,18 +111,18 @@ diff_method <- function(n.c, precision){
 	#print(f)
 	#print(sweep(diags$d3, diags$d2, diags$d1, f))
 	
-
-	M <- matrix(rep(0, times=length(x)^2), length(x), length(x))
-	
-	dd1 <- t(matrix(rep(1:length(M[1,]), each=2), 2, length(M[1,])))
-	dd2 <- matrix(c(1:(length(x)-1), 2:length(x)), length(x)-1, 2)
-	dd3 <- matrix(c(2:length(x), 1:(length(x)-1)), length(x)-1, 2)
-	
-	M[dd1] <- diags$d2
-	M[dd2] <- diags$d3
-	M[dd3] <- diags$d1
+# 
+# 	M <- matrix(rep(0, times=length(x)^2), length(x), length(x))
+# 	
+# 	dd1 <- t(matrix(rep(1:length(M[1,]), each=2), 2, length(M[1,])))
+# 	dd2 <- matrix(c(1:(length(x)-1), 2:length(x)), length(x)-1, 2)
+# 	dd3 <- matrix(c(2:length(x), 1:(length(x)-1)), length(x)-1, 2)
+# 	
+# 	M[dd1] <- diags$d2
+# 	M[dd2] <- diags$d3
+# 	M[dd3] <- diags$d1
   
-  source("R/TDMA.R")
+  
   
 	#return (solve(M, f))
   return (TDMA(diags$d1, diags$d2, diags$d3, f))
@@ -185,7 +187,7 @@ tst <- function(){
 	
 	print(solve(M, b))
 	
-	print(sweep(c(0.6, 1, 1.1, 7), c(rep(19, times=5)) ,c(2, 3, 8, 1), b))
+	print(TDMA(c(0.6, 1, 1.1, 7), c(rep(19, times=5)) ,c(2, 3, 8, 1), b))
 }
 
 

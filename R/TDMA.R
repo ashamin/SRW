@@ -2,6 +2,8 @@
 
 # @TODO: TDMA implementation 
 
+#' @author Anton Shamin
+
 # Tridiagonal Matrix Algorythm
 # a - lower diag, b - daig, c - upper diag
 TDMA <- function(a, b, c, d){
@@ -26,29 +28,11 @@ TDMA <- function(a, b, c, d){
   return (x)
 }
 
-form.diags <- function(n){
-  a <- rnorm(n-1) + 3
-  b <- rnorm(n) + 10
-  c <- rnorm(n-1) + 3
-  
-  return (list(a=a, b=b, c=c))
-}
-
-form.matrix <- function(a, b, c){
-  M <- diag(b)
+TDMA.m <- function(A, d){
+  b <- diag(A)
   diag.num <- -outer(seq(b),seq(b),"-")
-  M[diag.num == -1] = a
-  M[diag.num == 1] = c
+  a = A[diag.num == -1]
+  c = A[diag.num == 1]
   
-  return (M)
-}
-
-test <- function(n){
-  diags <- form.diags(5);
-  d <- rnorm(n) + 3;
-  
-  A <- form.matrix(diags$a, diags$b, diags$c)
-  
-  residuals <- solve(A, d) - TDMA(diags$a, diags$b, diags$c, d)
-  View(residuals)
+  return (TDMA(a, b, c, d))
 }
