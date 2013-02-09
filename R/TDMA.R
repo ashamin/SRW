@@ -33,6 +33,6 @@ TDMA.m <- function(A, d){
   diag.num <- -outer(seq(b),seq(b),"-")
   a = A[diag.num == -1]
   c = A[diag.num == 1]
-  
+        
   return (TDMA(a, b, c, d))
 }
