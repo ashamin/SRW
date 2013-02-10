@@ -24,6 +24,7 @@ init <- function(){
 #
 
 #Test 1
+# y.limit = 2
 # p <- 19
 # z <- function(t) p*t/16
 # 
@@ -46,6 +47,7 @@ init <- function(){
 # right.answer <- function(t, x) ((exp(z(t)) + exp(-z(t)))/2)*sin(x)
 
 #Test 2
+# y.limit = 1
 # p <- 3
 # z <- function(t) p*t/2
 # 
@@ -67,7 +69,9 @@ init <- function(){
 # 
 # right.answer <- function(t, x) (1+z(t))*exp(-z(t))*cos(x)
 
+
 #Test 3
+# y.limit = 1
 # p <- 8
 # 
 # a.test <- 1
@@ -89,6 +93,7 @@ init <- function(){
 # right.answer <- function(t, x) exp(-p*t)*sin(sqrt(p)*x)
 
 #Test 4
+# y.limit = 10
 # p <- 13
 # s <- (p+1)/p
 # 
@@ -111,6 +116,7 @@ init <- function(){
 # right.answer <- function(t, x) x*exp(sqrt(s)*x+s*t)
 
 #Test 5
+y.limit = .5
 p <- 23
 q <- p^(1/6)
 
@@ -233,9 +239,7 @@ slv <- function(Tr=Tr.test, l=l.test, a=a.test, u0=u0.test, f=f.test,
     opts <- ani.options(interval=.2, nmax=N+1)
     
     for (i in 1:N){
-      #plot(x, y[i,], type="l", col="blue", xlim=c(0, l), ylim=c(0, 100000))
-      #plot(x, y[i,], type="l", col="blue", xlim=c(0, l), ylim=c(0, 5))
-      plot(x, y[i,], type="l", col="blue", xlim=c(0, l), ylim=c(0, .5))
+      plot(x, y[i,], type="l", col="blue", xlim=c(0, l), ylim=c(0, y.limit))
       lines(x, ra[i,], type="l", col="magenta")
       
       ani.pause()
@@ -244,23 +248,11 @@ slv <- function(Tr=Tr.test, l=l.test, a=a.test, u0=u0.test, f=f.test,
     ani.pause()
   }
   
-  err = 0
-  perc.err = 0
-  for (i in 1:length(t))
-    for (j in 1:length(x)){
-      if (abs(y[i, j] - ra[i, j]) > err) err = abs(y[i, j] - ra[i, j])
-      if (min(y[i, j], ra[i,j]) != 0)
-        if ((100 * abs(y[i, j] - ra[i, j]) / ra[i,j]) > perc.err)
-          perc.err = 100 * abs(y[i, j] - ra[i, j]) / ra[i,j]
-    }
-  
-  print("Max error is: ")
-  print(err)
-  print("Max error in percents: ")
-  print(perc.err)
-  
-  #View(form.matrix(scheme$a, b=scheme$b, c=scheme$c)%*%ra[n+1,] - D.s)
-  
+  print("Error")
+  print(norm(ra - y) / norm(y))
+#   print("r")
+#   print(a^2 * tau / h)
+
   if (view.values == TRUE){
     View(y)
     View(ra)
