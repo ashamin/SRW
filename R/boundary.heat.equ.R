@@ -22,26 +22,48 @@ init <- function(){
 # Test area
 # You may change this for solving your own heat equation by default
 #
-p <- 19
-z <- function(t, x) p*t/16
 
-a.test <- sqrt(p)/4
+# p <- 19
+# z <- function(t) p*t/16
+# 
+# a.test <- sqrt(p)/4
+# l.test <- pi/2
+# Tr.test <- 10
+# 
+# u0.test <- function(x) sin(x)
+# 
+# f.test <- function(t, x) p/16*exp(z(t))*sin(x)
+# 
+# alpha1.test <- 0
+# beta1.test <- 1
+# mu1.test <- function(t) 0
+# 
+# alpha2.test <- 1
+# beta2.test <- 0
+# mu2.test <-function(t) 0
+# 
+# right.answer <- function(t, x) ((exp(z(t)) + exp(-z(t)))/2)*sin(x)
+
+p <- 3
+z <- function(t) p*t/2
+
+a.test <- sqrt(p/2)
 l.test <- pi/2
 Tr.test <- 10
 
-u0.test <- function(x) sin(x)
+u0.test <- function(x) cos(x)
 
-f.test <- function(t, x) p/16*exp(z(t, x))*sin(x)
+f.test <- function(t, x) p/2*exp(-z(t))*cos(x)
 
-alpha1.test <- 0
+alpha1.test <- 3
 beta1.test <- 1
-mu1.test <- function(t) 0
+mu1.test <- function(t) (1+z(t))*exp(-z(t))
 
-alpha2.test <- 1
-beta2.test <- 0
+alpha2.test <- 0
+beta2.test <- 1
 mu2.test <-function(t) 0
 
-right.answer <- function(t, x) ((exp(z(t, x)) + exp(-z(t, x)))/2)*sin(x)
+right.answer <- function(t, x) (1+z(t))*exp(-z(t))*cos(x)
 #
 #
 #
@@ -61,12 +83,12 @@ slv <- function(Tr=Tr.test, l=l.test, a=a.test, u0=u0.test, f=f.test,
   if (sigma > 1 | sigma < 0) stop("sigma value must lies in [0, 1]")
   else{
     if (sigma != 0 & sigma != 1){
-      mu1.m <- function(n) mu1(t[n+1]) + f(t[n+1], 0)*alpha1*h/(2*a^2)
-      mu2.m <- function(n) mu2(t[n+1]) + f(t[n+1], l)*alpha2*h/(2*a^2)
+      mu1.m <- function(n) mu1(t[n]+tau/2) + (alpha1*h / (2*a^2)) * f(t[n]+tau/2, 0)
+      mu2.m <- function(n) mu2(t[n]+tau/2) + (alpha2*h / (2*a^2)) * f(t[n]+tau/2, l)
     }
     else{
-      mu1.m = function(n) mu1(t[n]+tau/2) + f(t[n]+tau/2, 0)*alpha1*h/(2*a^2)
-      mu2.m = function(n) mu2(t[n]+tau/2) + f(t[n]+tau/2, l)*alpha2*h/(2*a^2)
+      mu1.m <- function(n) mu1(t[n+1]) + (alpha1*h / (2*a^2)) * f(t[n+1], 0)
+      mu2.m <- function(n) mu2(t[n+1]) + (alpha2*h / (2*a^2)) * f(t[n+1], l)
     }
   }
   
@@ -113,8 +135,8 @@ slv <- function(Tr=Tr.test, l=l.test, a=a.test, u0=u0.test, f=f.test,
   for (n in 1:(N-1)){
 
     #bulding scheme  
-    for (i in 2:(K-1))
-      D.s[i] <- D(n, i)
+    for (i in 1:(K-2))
+      D.s[i] <- D(n, i+1)
   
     scheme <- scheme.build(xi1=xi1, nu1=nu1(n), xi2=xi2, nu2=nu2(n), A, B, C, D.s, y[n+1,])
     y[n+1,] = TDMA(a=scheme$a, b=scheme$b, c=scheme$c, d=scheme$d)
@@ -140,12 +162,13 @@ slv <- function(Tr=Tr.test, l=l.test, a=a.test, u0=u0.test, f=f.test,
     
     for (i in 1:N){
       plot(x, y[i,], type="l", col="blue", xlim=c(0, l), ylim=c(0, 100000))
+      #plot(x, y[i,], type="l", col="blue", xlim=c(0, l), ylim=c(0, 5))
       lines(x, ra[i,], type="l", col="magenta")
       
       ani.pause()
     }
     
-    ani.pause() 
+    ani.pause()
   }
   
   err = 0
@@ -163,9 +186,11 @@ slv <- function(Tr=Tr.test, l=l.test, a=a.test, u0=u0.test, f=f.test,
   print("Max error in percents: ")
   print(perc.err)
   
+  #View(form.matrix(scheme$a, b=scheme$b, c=scheme$c)%*%ra[n+1,] - D.s)
+  
   if (view.values == TRUE){
     View(y)
-    View(ra)
+    View(ra)    
   }
 }
 
