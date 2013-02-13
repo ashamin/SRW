@@ -1,6 +1,7 @@
 # TODO: 
 #  1) Add SOR preconditioner
 #  2) Rewrite minimal residuals method
+#  3) check crossprod corresponding stuff
 ###############################################################################
 
 #' @description methods of solving differential schemes
