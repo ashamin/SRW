@@ -174,7 +174,9 @@ print.temperaturegrams <- function(x, y, A, b, I, J){
   
   sl <- matrix(s$root, (I-2), (J-2), byrow=FALSE)
   image(x[2:(I-1)], y[2:(J-1)], sl)
+  title("solve")
   image(x[2:(I-1)], y[2:(J-1)], ra)
+  title("right answer")
   
   print(data.frame(residual.norm=norm(ra - sl)/norm(sl), iteration.number=unique(s$it)))  
 }
