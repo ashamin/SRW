@@ -67,11 +67,17 @@ slv <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5, ma
     it <-it - 1
     
     r <- f - A%*%x0
-    delta <- solve(P)%*%r
+    
+    # if we compute tau we don't compute precoditioner and vice versa
+    # this ussumption gave us not crusial number of iterations, but it's just 
+    # experimental suggestion. not final solve of problem
+    if (tao.compute) delta <- r
+    else delta <- solve(P)%*%r
     
     #minimal residuals method
     if (tao.compute){
       tao <- as.double(crossprod(A%*%r, r)/crossprod(A%*%r, A%*%r))
+      print(norm(r))
     }
     
     x <- x0 + tao*delta
@@ -83,8 +89,8 @@ slv <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5, ma
   data.frame(root=x, residual=f - A%*%x, it=maxit-it)
 }
 
-test <- function(n, P=SSOR.precond.approach1(A, .8), x0=rnorm(length(f)), epsilon=1e-5, maxit=200, tao=1, tao.compute=FALSE){
+test <- function(n, P=SSOR.precond.approach1(A, 1), x0=rnorm(length(f)), epsilon=1e-5, maxit=200, tao=1, tao.compute=FALSE){
   A <- gen.matrix.diag.dominant(n);
   f <- rnorm(n)
-  slv(A, f, P)
+  slv(A, f, P, x0, epsilon, maxit, tao, tao.compute)
 }

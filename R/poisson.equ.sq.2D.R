@@ -19,7 +19,6 @@
 
 
 # TODO: 
-#   1) implement case when I != J
 #   2) include borders to temperaturegrams
 
 init <- function(){
@@ -138,7 +137,7 @@ form.A.matrix <- function(n, h1, h2, I, J){
   diag.num <- -outer(seq(d),seq(d),"-")
   A[diag.num == 0] = rep(-(2/h1^2 + 2/h2^2), times=length(A[diag.num == 0]))
   A[diag.num == 1] = A[diag.num == -1] = rep(1/h1^2, times=length(A[diag.num == 1]))
-  A[diag.num == (I-2)] = A[diag.num == -(J-2)] = rep(1/h2^2, times=length(A[diag.num == (I-2)]))
+  A[diag.num == (I-2)] = A[diag.num == -(I-2)] = rep(1/h2^2, times=length(A[diag.num == (I-2)]))
   
   d <- A[diag.num == 1]
   d[seq(from=(I-2), to=length(d), by=(I-2))] = 0
