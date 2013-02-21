@@ -63,6 +63,7 @@ relax.precond <- function(A, w){
 
 slv <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5, maxit=200, tao=1, tao.compute=FALSE){
   it <- maxit
+  step.residual <- double(0)
   repeat{
     it <-it - 1
     
@@ -77,7 +78,7 @@ slv <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5, ma
     #minimal residuals method
     if (tao.compute){
       tao <- as.double(crossprod(A%*%r, r)/crossprod(A%*%r, A%*%r))
-      print(norm(r))
+      step.residual <- c(step.residual, norm(r))
     }
     
     x <- x0 + tao*delta
@@ -86,7 +87,7 @@ slv <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5, ma
     if (max(abs(f - A%*%x)) < epsilon) break 
     if (it == 0) stop("Iteration process obviously won't converge. \n Try to increase \"maxit\" value")
   }
-  data.frame(root=x, residual=f - A%*%x, it=maxit-it)
+  return (list(root=x, residual=f - A%*%x, it=maxit-it, step.residual=step.residual))
 }
 
 test <- function(n, P=SSOR.precond.approach1(A, 1), x0=rnorm(length(f)), epsilon=1e-5, maxit=200, tao=1, tao.compute=FALSE){

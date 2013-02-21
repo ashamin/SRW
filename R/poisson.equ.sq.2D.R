@@ -169,7 +169,7 @@ print.temperaturegrams <- function(x, y, A, b, I, J){
       ra[i-1, j-1] = right.answer(x[i], y[j])
   par(mfcol=c(1, 2))
   
-  s <- slv(A, b, P=SSOR.precond.approach1(A, 1), maxit=1000)
+  s <- slv(A, b, P=SSOR.precond.approach1(A, 1), maxit=30000, tao.compute=TRUE)
   
   sl <- matrix(s$root, (I-2), (J-2), byrow=FALSE)
   image(x[2:(I-1)], y[2:(J-1)], sl)
