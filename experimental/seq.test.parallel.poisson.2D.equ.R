@@ -1,4 +1,8 @@
 
+# TODO: 
+#   1) check result for transpose. edit?
+#   
+
 # works with version of solving poisson 2D equation in R/poisson.equ.sq.2D.R implementation
 
 source("R/poisson.equ.sq.2D.R")
@@ -40,8 +44,18 @@ slv.seq.par <- function(a=a.test, b=b.test, g1=g1.test, g2=g2.test,
     res2[,(j-1)] = TDMA.m(A, b)
   }
   
-  image(x[2:(I-1)], y[2:(J-1)], t(res1+res2))
+  
+  res = t(res1+res2)
+  
+  image(x[2:(I-1)], y[2:(J-1)], res)
   title("experimental solve")
+  
+  ra <- matrix(rep(0, (length(x)-2)*(length(y)-2)), length(x)-2, length(y)-2, byrow=TRUE)
+  for (i in 2:(length(x)-1))
+    for (j in 2:(length(y)-1))
+      ra[i-1, j-1] = right.answer(x[i], y[j])
+  
+  print(norm(ra - res)/norm(res))
                           
 }
 
