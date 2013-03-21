@@ -64,10 +64,6 @@ mincorr <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5
     
     #############################
     #taus = c(taus, tau)
-#     print(tau)
-#     if (it == maxit - 5){
-#       break
-#     }
     
     x <- x0 + tau*w
     x0 <- x

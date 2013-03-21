@@ -21,12 +21,10 @@
 # TODO: 
 #   2) include borders to temperaturegrams
 
-init <- function(){
-  # implementation of iterative methods of MINRES class
-  source("R/minres.R")
-  # Preconditioners for iterative methods of solving linear equation systems
-  source("R/precond.R")
-}
+# implementation of iterative methods of MINRES class
+source("R/minres.R")
+# Preconditioners for iterative methods of solving linear equation systems
+source("R/precond.R")
 
 # Test area
 # You may change this for solving your own Poisson equation by default
@@ -110,7 +108,7 @@ right.answer <- function(x, y) x + 3*x^2 - 10*x*y - 2*y - 4*y^2 + (p-15)*sin(pi*
 #
 
 
-
+# Caution! f - it's not right part of equation!
 slv.poisson <- function(a=a.test, b=b.test, g1=g1.test, g2=g2.test,
                 g3=g3.test, g4=g4.test, f=f.test,
                 I=10, J=10, h1=a/(I-1), h2=b/(J-1)){
@@ -145,7 +143,7 @@ form.A.matrix <- function(n, h1, h2, I, J){
   d <- A[diag.num == 1]
   d[seq(from=(I-2), to=length(d), by=(I-2))] = 0
   A[diag.num == 1] = A[diag.num == -1] = d
-  
+
   return (A)
 }
 
@@ -173,6 +171,8 @@ print.temperaturegrams <- function(x, y, A, b, I, J){
   par(mfcol=c(1, 2))
   
   s <- mincorr(A, b, P=SSOR.precond.approach1(A, 1), maxit=1000)
+#   s <- minres(A, b, P=SSOR.precond.approach1(A, 1), maxit=10000)
+#   s <- minres(A, b, P=SSOR.precond.approach1(A, 1), maxit=1000, tau.compute=FALSE)
   
   sl <- matrix(s$root, (I-2), (J-2), byrow=FALSE)
   image(x[2:(I-1)], y[2:(J-1)], sl)
