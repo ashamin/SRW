@@ -6,6 +6,7 @@
 # works with version of solving poisson 2D equation in R/poisson.equ.sq.2D.R implementation
 
 source("R/poisson.equ.sq.2D.R")
+source("R/TDMA.R")
 
 # test answer function
 # answ <- function(x, y){
@@ -56,6 +57,7 @@ slv.seq.par <- function(a=a.test, b=b.test, g1=g1.test, g2=g2.test,
       ra[i-1, j-1] = right.answer(x[i], y[j])
   
   print(norm(ra - res)/norm(res))
+#   View(data.frame(right.answer=ra[1,], solve=res[1,]))
                           
 }
 
@@ -65,11 +67,12 @@ form.A.matrix.1 <- function(n, h, I){
   d <- diag(A)
   diag.num <- -outer(seq(d),seq(d),"-")
   
-  A[diag.num == 0] = rep(rep(-2/h^2), times=length(A[diag.num == 0]))
-  A[diag.num == 1] = A[diag.num == -1] = rep(rep(1/h^2), times=length(A[diag.num == 1]))
+  A[diag.num == 0] = rep(rep(-4/h^2), times=length(A[diag.num == 0]))
+  A[diag.num == 1] = A[diag.num == -1] = rep(rep(2/h^2), times=length(A[diag.num == 1]))
   
   return (A)
 }
+
 
 form.b.1 <- function(n, I, x, y, h, f, g1, g2){
   b <- rep(0, times=n)
