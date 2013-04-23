@@ -12,7 +12,7 @@ print.temperaturegrams.par.method <- function(x, y, A, b, I, J, n, h){
 #   print(P$Mx)
 #   print(P$My)
   
-  s <- mincorr.par(A, b, P=SSOR.par(1, n, I, h), maxit=10000)
+  s <- mincorr.par(A, b, P=SSOR.par(.5, n, I, h), maxit=10000)
   
   #   s <- mincorr(A, b, P=SSOR.precond.approach1(A, 1), maxit=1000))
   #   s <- minres(A, b, P=SSOR.precond.approach1(A, 1), maxit=10000)

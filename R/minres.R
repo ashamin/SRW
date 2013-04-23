@@ -103,6 +103,7 @@ mincorr.par <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
     corr = TDMA.m(P$My, tmp)
     
     tau <- as.double(crossprod(Aw, w)/crossprod(iP%*%Aw, Aw))
+    #tau = .95
     step.residual <- c(step.residual, norm(r))
     
     #############################
@@ -113,6 +114,7 @@ mincorr.par <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
     x0 <- x
     
     print(max(abs(f - A%*%x)))
+    #print(tau)
     
     if (max(abs(f - A%*%x)) < epsilon) break 
 #     if (it == 0) stop("Iteration process obviously won't converge. \n Try to increase \"maxit\" value")
