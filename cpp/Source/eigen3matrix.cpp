@@ -34,11 +34,17 @@ SRWVector* Eigen3Matrix::diag(int diagnum){
 }
 
 bool Eigen3Matrix::setDiag(int diagnum, SRWVector *v){
-    VectorXd d(v->length());
-    for (int i = 0; i<v->length(); i++)
-        d(i) = v->get(i);
-    this->matrix.diagonal(diagnum) = d;
-    return true;
+    if (((diagnum < 0 && diagnum < this->rows()) ||
+            (diagnum > 0 && diagnum < this->cols())) &&
+            this->diag(diagnum)->length() == v->length()){
+
+        VectorXd d(v->length());
+        for (int i = 0; i<v->length(); i++)
+            d(i) = v->get(i);
+        this->matrix.diagonal(diagnum) = d;
+        return true;
+    }
+    return false;
 }
 
 SRWMatrix* Eigen3Matrix::transpose(){

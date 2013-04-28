@@ -25,6 +25,10 @@ public:
     virtual SRWMatrix* transpose();
     virtual SRWMatrix* inverse();
 
+    MatrixXd getMatrix(){
+        return this->matrix;
+    }
+
 private:
     MatrixXd matrix;
 };
