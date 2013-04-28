@@ -6,18 +6,17 @@
 class SRWMatrix
 {
 public:
-
-    virtual int rowsNum() = 0;
-    virtual int columnsNum() = 0;
+    virtual int rows() = 0;
+    virtual int cols() = 0;
 
     virtual double get(int row, int column) = 0;
-    virtual double set(int row, int column, int value) = 0;
+    virtual bool set(int row, int column, double value) = 0;
 
-    virtual SRWVector* diag() = 0;
     virtual SRWVector* diag(int diagnum) = 0;
-    virtual void setDiag(int diagnum, SRWVector* v) = 0;
+    virtual bool setDiag(int diagnum, SRWVector* v) = 0;
 
-    virtual SRWMatrix* transpose(SRWMatrix* matrix) = 0;
+    virtual SRWMatrix* transpose() = 0;
+    virtual SRWMatrix* inverse() = 0;
 };
 
 #endif // SRWMATRIX_H

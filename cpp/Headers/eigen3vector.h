@@ -13,11 +13,19 @@ public:
     ~Eigen3Vector();
 
     virtual double get(int index);
+    virtual bool set(int index, double value);
     virtual int length();
+
+    virtual SRWVector* segment(int index, int length);
+
+    virtual Eigen3Vector& operator= (const Eigen3Vector& v);
+
+    VectorXd getVector(){
+        return this->vector;
+    }
 
 private:
     VectorXd vector;
-    int size;
 };
 
 #endif // EIGEN3VECTOR_H
