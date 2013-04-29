@@ -25,6 +25,9 @@ public:
     virtual SRWMatrix* transpose();
     virtual SRWMatrix* inverse();
 
+    virtual Eigen3Matrix& operator= (const Eigen3Matrix& m);
+    virtual Eigen3Matrix* operator* (const Eigen3Matrix* m2);
+
     MatrixXd getMatrix(){
         return this->matrix;
     }

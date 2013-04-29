@@ -2,7 +2,7 @@
 
 Eigen3Matrix::Eigen3Matrix(int rows, int columns)
 {
-    this->matrix = MatrixXd(rows, columns);
+    this->matrix = MatrixXd::Random(rows, columns);
 }
 
 int Eigen3Matrix::rows(){
@@ -56,5 +56,21 @@ SRWMatrix* Eigen3Matrix::transpose(){
 SRWMatrix* Eigen3Matrix::inverse(){
     Eigen3Matrix* m = new Eigen3Matrix(this->cols(), this->rows());
     m->matrix = this->matrix.inverse();
+    return m;
+}
+
+Eigen3Matrix& Eigen3Matrix::operator= (const Eigen3Matrix& m){
+    if (this == &m){
+        return *this;
+    }
+    else{
+        this->matrix = m.matrix;
+        return *this;
+    }
+}
+
+Eigen3Matrix* Eigen3Matrix::operator* (const Eigen3Matrix* m2){
+    Eigen3Matrix* m = new Eigen3Matrix(1, 21);
+    m->matrix = this->matrix * m2->matrix;
     return m;
 }

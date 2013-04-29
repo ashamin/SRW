@@ -6,6 +6,8 @@
 #include <iostream>
 #include "stdio.h"
 #include "Headers/eigen3vector.h"
+#include "Headers/srwmatrix.h"
+#include "Headers/eigen3matrix.h"
 
 //using namespace Eigen;
 using namespace std;
@@ -48,11 +50,36 @@ int main(int argc, char *argv[])
     cout << v1->getVector() << endl << v1 << endl << endl;
     cout << v2->getVector() << endl << v2 << endl << endl;*/
 
-    VectorXd v1 = VectorXd::Random(100);
-    VectorXd v2 = VectorXd::Random(100);
-    v2 = v1;
+    //SRWVector* v1 = new Eigen3Vector(10);
+
+    //cout << ((Eigen3Vector*)v1)->getVector() << endl;
+
+    /*Eigen3Matrix* m = new Eigen3Matrix(5, 5);
+    Eigen3Matrix* m1 = new Eigen3Matrix(5, 5);
+    Eigen3Matrix* m2 = new Eigen3Matrix(5, 5);
+
+    cout << m->getMatrix() << endl;
+
+    m = *m1 * m2;
+
+    MatrixXd x = m1->getMatrix() * m2->getMatrix();
+
+    if (m->getMatrix() == x) cout << "OLOLOLOLOLO" << endl;*/
 
 
+    /*SRWMatrix& m = Eigen3Matrix(5, 5);
+
+    static_cast<Eigen3Matrix>(m)(5, 5);*/
+
+
+    //cout << m1 << endl;
+   // cout << m.getMatrix() << endl;
+   /* cout << m1->getMatrix() << endl;
+    cout << m->getMatrix() << endl;*/
+
+    SRWMatrix &x = *(new Eigen3Matrix(3, 3));
+
+    cout << dynamic_cast<Eigen3Matrix&>(x).getMatrix();
 
     return 0;
 }

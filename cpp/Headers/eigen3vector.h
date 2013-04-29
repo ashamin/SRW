@@ -18,7 +18,11 @@ public:
 
     virtual SRWVector* segment(int index, int length);
 
-    virtual Eigen3Vector& operator= (const Eigen3Vector& v);
+    virtual SRWVector& operator= (SRWVector& v);
+
+    virtual Eigen3Vector* operator* (const Eigen3Vector* v2);
+    virtual Eigen3Vector* operator+ (const Eigen3Vector* v2);
+    virtual Eigen3Vector* operator- (const Eigen3Vector* v2);
 
     VectorXd getVector(){
         return this->vector;

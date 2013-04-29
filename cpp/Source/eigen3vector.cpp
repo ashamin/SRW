@@ -2,7 +2,7 @@
 
 Eigen3Vector::Eigen3Vector(int length)
 {
-    this->vector = VectorXd(length);
+    this->vector = VectorXd::Random(length);
 }
 
 double Eigen3Vector::get(int index){
@@ -27,13 +27,32 @@ SRWVector* Eigen3Vector::segment(int index, int length){
     return v;
 }
 
-Eigen3Vector& Eigen3Vector::operator= (const Eigen3Vector& v){
+SRWVector& Eigen3Vector::operator= (SRWVector& v){
     if (this == &v)
         return *this;
     else{
-        this->vector = v.vector;
+        this->vector =  dynamic_cast<Eigen3Vector&>(v).vector;
         return *this;
     }
+    return *this;
+}
+
+Eigen3Vector* Eigen3Vector::operator* (const Eigen3Vector* v2){
+    Eigen3Vector* v = new Eigen3Vector(1);
+    v->vector = this->vector * v2->vector;
+    return v;
+}
+
+Eigen3Vector* Eigen3Vector::operator+ (const Eigen3Vector* v2){
+    Eigen3Vector* v = new Eigen3Vector(1);
+    v->vector = this->vector + v2->vector;
+    return v;
+}
+
+Eigen3Vector* Eigen3Vector::operator- (const Eigen3Vector* v2){
+    Eigen3Vector* v = new Eigen3Vector(1);
+    v->vector = this->vector - v2->vector;
+    return v;
 }
 
 Eigen3Vector::~Eigen3Vector(){

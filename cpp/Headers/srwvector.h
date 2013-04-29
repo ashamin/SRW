@@ -17,6 +17,8 @@ public:
      * @return
      */
     virtual SRWVector* segment(int index, int length) = 0;
+
+    //virtual SRWVector& operator= (const SRWVector& v) = 0;
 };
 
 #endif // SRWVECTOR_H
