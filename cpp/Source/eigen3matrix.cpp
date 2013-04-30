@@ -13,18 +13,6 @@ int Eigen3Matrix::cols(){
     return this->matrix.cols();
 }
 
-double Eigen3Matrix::get(int row, int column){
-    return this->matrix(row, column);
-}
-
-bool Eigen3Matrix::set(int row, int column, double value){
-    if (row < this->matrix.rows() && column < this->matrix.cols()){
-        this->matrix(row, column) = value;
-        return true;
-    }
-    return false;
-}
-
 SRWVector& Eigen3Matrix::diag(int diagnum){
     Eigen3Vector& ret_v = *(new Eigen3Vector(1));
     ret_v.vector = this->matrix.diagonal(diagnum);
@@ -83,4 +71,8 @@ SRWMatrix& Eigen3Matrix::operator -(SRWMatrix& m){
     Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
     ret_m.matrix = this->matrix * dynamic_cast<Eigen3Matrix&>(m).matrix;
     return ret_m;
+}
+
+double& Eigen3Matrix::operator ()(int row, int column){
+    return this->matrix(row, column);
 }

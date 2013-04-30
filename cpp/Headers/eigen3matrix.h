@@ -16,9 +16,6 @@ public:
     virtual int rows();
     virtual int cols();
 
-    virtual double get(int row, int column);
-    virtual bool set(int row, int column, double value);
-
     virtual SRWVector& diag(int diagnum);
     virtual bool setDiag(int diagnum, SRWVector& v);
 
@@ -30,6 +27,9 @@ public:
     virtual SRWVector& operator *(SRWVector& v);
     virtual SRWMatrix& operator +(SRWMatrix& m);
     virtual SRWMatrix& operator -(SRWMatrix& m);
+
+    //virtual SRWVector& operator [](int index);
+    virtual double& operator ()(int row, int column);
 
     MatrixXd getMatrix(){
         return this->matrix;

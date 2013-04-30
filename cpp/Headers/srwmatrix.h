@@ -9,9 +9,6 @@ public:
     virtual int rows() = 0;
     virtual int cols() = 0;
 
-    virtual double get(int row, int column) = 0;
-    virtual bool set(int row, int column, double value) = 0;
-
     virtual SRWVector& diag(int diagnum) = 0;
     virtual bool setDiag(int diagnum, SRWVector& v) = 0;
 
@@ -24,6 +21,9 @@ public:
     virtual SRWVector& operator* (SRWVector& v) = 0;
     virtual SRWMatrix& operator+ (SRWMatrix& m) = 0;
     virtual SRWMatrix& operator- (SRWMatrix& m) = 0;
+
+    //virtual SRWVector& operator [](int index) = 0;
+    virtual double& operator ()(int row, int column) = 0;
 };
 
 #endif // SRWMATRIX_H

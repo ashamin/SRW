@@ -4,8 +4,6 @@
 class SRWVector
 {
 public:
-    virtual double get(int index) = 0;
-    virtual bool set(int index, double value) = 0;
     virtual int length() = 0;
 
     /**
@@ -23,6 +21,9 @@ public:
     //virtual SRWVector& operator* (SRWVector& v) = 0;
     virtual SRWVector& operator+ (SRWVector& v) = 0;
     virtual SRWVector& operator- (SRWVector& v) = 0;
+
+    virtual double& operator [](int index) = 0;
+    virtual double& operator ()(int index) = 0;
 };
 
 #endif // SRWVECTOR_H

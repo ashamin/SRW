@@ -5,18 +5,6 @@ Eigen3Vector::Eigen3Vector(int length)
     this->vector = VectorXd::Random(length);
 }
 
-double Eigen3Vector::get(int index){
-    return this->vector(index);
-}
-
-bool Eigen3Vector::set(int index, double value){
-    if (index < this->length()){
-        this->vector(index) = value;
-        return true;
-    }
-    return false;
-}
-
 int Eigen3Vector::length(){
     return this->vector.rows();
 }
@@ -54,6 +42,15 @@ SRWVector& Eigen3Vector::operator- (SRWVector& v){
     ret_v.vector = this->vector - dynamic_cast<Eigen3Vector&>(v).vector;
     return ret_v;
 }
+
+double& Eigen3Vector::operator [](int index){
+    return this->vector(index);
+}
+
+double& Eigen3Vector::operator ()(int index){
+    return this->vector(index);
+}
+
 
 Eigen3Vector::~Eigen3Vector(){
 

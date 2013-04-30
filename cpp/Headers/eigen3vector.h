@@ -13,8 +13,6 @@ public:
     Eigen3Vector(int length);
     ~Eigen3Vector();
 
-    virtual double get(int index);
-    virtual bool set(int index, double value);
     virtual int length();
 
     virtual SRWVector& segment(int index, int length);
@@ -24,6 +22,9 @@ public:
     //virtual SRWVector& operator* (SRWVector& v);
     virtual SRWVector& operator+ (SRWVector& v);
     virtual SRWVector& operator- (SRWVector& v);
+
+    virtual double& operator [](int index);
+    virtual double& operator ()(int index);
 
     VectorXd getVector(){
         return this->vector;
