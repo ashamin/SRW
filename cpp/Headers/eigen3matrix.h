@@ -22,11 +22,14 @@ public:
     virtual SRWVector& diag(int diagnum);
     virtual bool setDiag(int diagnum, SRWVector& v);
 
-    virtual SRWMatrix* transpose();
-    virtual SRWMatrix* inverse();
+    virtual SRWMatrix& transpose();
+    virtual SRWMatrix& inverse();
 
-    virtual Eigen3Matrix& operator= (const Eigen3Matrix& m);
-    virtual Eigen3Matrix* operator* (const Eigen3Matrix* m2);
+    virtual SRWMatrix& operator= (SRWMatrix& m);
+    virtual SRWMatrix& operator *(SRWMatrix& m);
+    virtual SRWVector& operator *(SRWVector& v);
+    virtual SRWMatrix& operator +(SRWMatrix& m);
+    virtual SRWMatrix& operator -(SRWMatrix& m);
 
     MatrixXd getMatrix(){
         return this->matrix;

@@ -15,8 +15,15 @@ public:
     virtual SRWVector& diag(int diagnum) = 0;
     virtual bool setDiag(int diagnum, SRWVector& v) = 0;
 
-    virtual SRWMatrix* transpose() = 0;
-    virtual SRWMatrix* inverse() = 0;
+    virtual SRWMatrix& transpose() = 0;
+    virtual SRWMatrix& inverse() = 0;
+
+    virtual SRWMatrix& operator= (SRWMatrix& m) = 0;
+
+    virtual SRWMatrix& operator* (SRWMatrix& m) = 0;
+    virtual SRWVector& operator* (SRWVector& v) = 0;
+    virtual SRWMatrix& operator+ (SRWMatrix& m) = 0;
+    virtual SRWMatrix& operator- (SRWMatrix& m) = 0;
 };
 
 #endif // SRWMATRIX_H

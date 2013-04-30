@@ -29,70 +29,6 @@ int main(int argc, char *argv[])
 
     m1 =  m1*m2;*/
 
-    //cout << m1 << endl << endl << m1.transpose() << endl<< endl<< v2  << endl;
-
-    cout << "olol" << endl;
-
-    /*Eigen3Vector* v1 = new Eigen3Vector(5);
-    Eigen3Vector* v2 = new Eigen3Vector(1);
-
-    for (int i =0; i<5; i++)
-        v1->set(i, i*5);
-    v2->set(0, 20);
-
-    cout << v1->getVector() << endl << v1 << endl << endl;
-    cout << v2->getVector() << endl << v2 << endl << endl;
-
-    *v1 = *v2;
-
-    v1->set(0, 10000);
-
-    cout << v1->getVector() << endl << v1 << endl << endl;
-    cout << v2->getVector() << endl << v2 << endl << endl;*/
-
-    //SRWVector* v1 = new Eigen3Vector(10);
-
-    //cout << ((Eigen3Vector*)v1)->getVector() << endl;
-
-    /*Eigen3Matrix* m = new Eigen3Matrix(5, 5);
-    Eigen3Matrix* m1 = new Eigen3Matrix(5, 5);
-    Eigen3Matrix* m2 = new Eigen3Matrix(5, 5);
-
-    cout << m->getMatrix() << endl;
-
-    m = *m1 * m2;
-
-    MatrixXd x = m1->getMatrix() * m2->getMatrix();
-
-    if (m->getMatrix() == x) cout << "OLOLOLOLOLO" << endl;*/
-
-
-    /*SRWMatrix& m = Eigen3Matrix(5, 5);
-
-    static_cast<Eigen3Matrix>(m)(5, 5);*/
-
-
-    //cout << m1 << endl;
-   // cout << m.getMatrix() << endl;
-   /* cout << m1->getMatrix() << endl;
-    cout << m->getMatrix() << endl;*/
-
-    /*SRWVector &x = *(new Eigen3Vector(3));
-
-    SRWVector &y = *(new Eigen3Vector(3));
-
-
-    cout << &x << endl;
-    cout << dynamic_cast<Eigen3Vector&>(x).getVector() << endl << endl;
-    cout << &y << endl;
-    cout << dynamic_cast<Eigen3Vector&>(y).getVector() << endl << endl;
-
-    x = x - y;
-
-    cout << &x << endl;
-    cout << &y << endl;
-    cout << dynamic_cast<Eigen3Vector&>(x).getVector() << endl << endl;*/
-
 
     SRWMatrix& m = *(new Eigen3Matrix(5, 5));
 
@@ -105,7 +41,15 @@ int main(int argc, char *argv[])
     if (olol) cout << "OK" << endl;
 
     cout << dynamic_cast<Eigen3Matrix&>(m).getMatrix() << endl << endl
-         << dynamic_cast<Eigen3Vector&>(v).getVector() << endl;
+         << dynamic_cast<Eigen3Vector&>(v).getVector() << endl << endl;
+
+    m = m.transpose();
+
+    cout << dynamic_cast<Eigen3Matrix&>(m).getMatrix() << endl << endl;
+
+    SRWMatrix& im = m.inverse();
+
+    cout << dynamic_cast<Eigen3Matrix&>(im * m).getMatrix() << endl << endl;
 
 
     return 0;

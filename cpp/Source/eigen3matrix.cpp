@@ -39,30 +39,48 @@ bool Eigen3Matrix::setDiag(int diagnum, SRWVector &v){
     return false;
 }
 
-SRWMatrix* Eigen3Matrix::transpose(){
-    Eigen3Matrix* m = new Eigen3Matrix(this->cols(), this->rows());
-    m->matrix = this->matrix.transpose();
+SRWMatrix& Eigen3Matrix::transpose(){
+    Eigen3Matrix& m = *(new Eigen3Matrix(this->cols(), this->rows()));
+    m.matrix = this->matrix.transpose();
     return m;
 }
 
-SRWMatrix* Eigen3Matrix::inverse(){
-    Eigen3Matrix* m = new Eigen3Matrix(this->cols(), this->rows());
-    m->matrix = this->matrix.inverse();
+SRWMatrix& Eigen3Matrix::inverse(){
+    Eigen3Matrix& m = *(new Eigen3Matrix(this->cols(), this->rows()));
+    m.matrix = this->matrix.inverse();
     return m;
 }
 
-Eigen3Matrix& Eigen3Matrix::operator= (const Eigen3Matrix& m){
+SRWMatrix& Eigen3Matrix::operator =(SRWMatrix& m){
     if (this == &m){
         return *this;
     }
     else{
-        this->matrix = m.matrix;
+        this->matrix = dynamic_cast<Eigen3Matrix&>(m).matrix;
         return *this;
     }
 }
 
-Eigen3Matrix* Eigen3Matrix::operator* (const Eigen3Matrix* m2){
-    Eigen3Matrix* m = new Eigen3Matrix(1, 21);
-    m->matrix = this->matrix * m2->matrix;
-    return m;
+SRWMatrix& Eigen3Matrix::operator *(SRWMatrix& m){
+    Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
+    ret_m.matrix = this->matrix * dynamic_cast<Eigen3Matrix&>(m).matrix;
+    return ret_m;
+}
+
+SRWVector& Eigen3Matrix::operator *(SRWVector& v){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(this->rows()));
+    ret_v.vector = this->matrix * dynamic_cast<Eigen3Vector&>(v).vector;
+    return ret_v;
+}
+
+SRWMatrix& Eigen3Matrix::operator +(SRWMatrix& m){
+    Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
+    ret_m.matrix = this->matrix + dynamic_cast<Eigen3Matrix&>(m).matrix;
+    return ret_m;
+}
+
+SRWMatrix& Eigen3Matrix::operator -(SRWMatrix& m){
+    Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
+    ret_m.matrix = this->matrix * dynamic_cast<Eigen3Matrix&>(m).matrix;
+    return ret_m;
 }
