@@ -25,23 +25,15 @@ bool Eigen3Matrix::set(int row, int column, double value){
     return false;
 }
 
-SRWVector* Eigen3Matrix::diag(int diagnum){
-    VectorXd d = this->matrix.diagonal(diagnum);
-    Eigen3Vector* v = new Eigen3Vector(d.rows());
-    for (int i = 0; i<v->length(); i++)
-        v->set(i, d(i));
-    return v;
+SRWVector& Eigen3Matrix::diag(int diagnum){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(1));
+    ret_v.vector = this->matrix.diagonal(diagnum);
+    return ret_v;
 }
 
-bool Eigen3Matrix::setDiag(int diagnum, SRWVector *v){
-    if (((diagnum < 0 && diagnum < this->rows()) ||
-            (diagnum > 0 && diagnum < this->cols())) &&
-            this->diag(diagnum)->length() == v->length()){
-
-        VectorXd d(v->length());
-        for (int i = 0; i<v->length(); i++)
-            d(i) = v->get(i);
-        this->matrix.diagonal(diagnum) = d;
+bool Eigen3Matrix::setDiag(int diagnum, SRWVector &v){
+    if (this->diag(diagnum).length() == v.length()){
+        this->matrix.diagonal(diagnum) = dynamic_cast<Eigen3Vector&>(v).vector;
         return true;
     }
     return false;

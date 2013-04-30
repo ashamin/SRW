@@ -2,6 +2,7 @@
 #define EIGEN3VECTOR_H
 
 #include "Headers/srwvector.h"
+#include "Headers/eigen3matrix.h"
 #include "Eigen/Dense"
 
 using namespace Eigen;
@@ -16,17 +17,19 @@ public:
     virtual bool set(int index, double value);
     virtual int length();
 
-    virtual SRWVector* segment(int index, int length);
+    virtual SRWVector& segment(int index, int length);
 
     virtual SRWVector& operator= (SRWVector& v);
 
-    virtual Eigen3Vector* operator* (const Eigen3Vector* v2);
-    virtual Eigen3Vector* operator+ (const Eigen3Vector* v2);
-    virtual Eigen3Vector* operator- (const Eigen3Vector* v2);
+    //virtual SRWVector& operator* (SRWVector& v);
+    virtual SRWVector& operator+ (SRWVector& v);
+    virtual SRWVector& operator- (SRWVector& v);
 
     VectorXd getVector(){
         return this->vector;
     }
+
+    friend class Eigen3Matrix;
 
 private:
     VectorXd vector;

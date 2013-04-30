@@ -77,9 +77,36 @@ int main(int argc, char *argv[])
    /* cout << m1->getMatrix() << endl;
     cout << m->getMatrix() << endl;*/
 
-    SRWMatrix &x = *(new Eigen3Matrix(3, 3));
+    /*SRWVector &x = *(new Eigen3Vector(3));
 
-    cout << dynamic_cast<Eigen3Matrix&>(x).getMatrix();
+    SRWVector &y = *(new Eigen3Vector(3));
+
+
+    cout << &x << endl;
+    cout << dynamic_cast<Eigen3Vector&>(x).getVector() << endl << endl;
+    cout << &y << endl;
+    cout << dynamic_cast<Eigen3Vector&>(y).getVector() << endl << endl;
+
+    x = x - y;
+
+    cout << &x << endl;
+    cout << &y << endl;
+    cout << dynamic_cast<Eigen3Vector&>(x).getVector() << endl << endl;*/
+
+
+    SRWMatrix& m = *(new Eigen3Matrix(5, 5));
+
+    SRWVector& v = m.diag(-1);
+
+    v = *(new Eigen3Vector(5));
+
+    bool olol = m.setDiag(0, v);
+
+    if (olol) cout << "OK" << endl;
+
+    cout << dynamic_cast<Eigen3Matrix&>(m).getMatrix() << endl << endl
+         << dynamic_cast<Eigen3Vector&>(v).getVector() << endl;
+
 
     return 0;
 }

@@ -19,8 +19,8 @@ public:
     virtual double get(int row, int column);
     virtual bool set(int row, int column, double value);
 
-    virtual SRWVector* diag(int diagnum);
-    virtual bool setDiag(int diagnum, SRWVector* v);
+    virtual SRWVector& diag(int diagnum);
+    virtual bool setDiag(int diagnum, SRWVector& v);
 
     virtual SRWMatrix* transpose();
     virtual SRWMatrix* inverse();

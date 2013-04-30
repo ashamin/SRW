@@ -21,9 +21,9 @@ int Eigen3Vector::length(){
     return this->vector.rows();
 }
 
-SRWVector* Eigen3Vector::segment(int index, int length){
-    Eigen3Vector* v = new Eigen3Vector(length);
-    v->vector = this->vector.segment(index, length);
+SRWVector& Eigen3Vector::segment(int index, int length){
+    Eigen3Vector& v = *(new Eigen3Vector(length));
+    v.vector = this->vector.segment(index, length);
     return v;
 }
 
@@ -37,22 +37,22 @@ SRWVector& Eigen3Vector::operator= (SRWVector& v){
     return *this;
 }
 
-Eigen3Vector* Eigen3Vector::operator* (const Eigen3Vector* v2){
-    Eigen3Vector* v = new Eigen3Vector(1);
-    v->vector = this->vector * v2->vector;
-    return v;
+/*SRWVector& Eigen3Vector::operator* (SRWVector& v){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
+    ret_v.vector = this->vector * dynamic_cast<Eigen3Vector&>(v).vector;
+    return ret_v;
+}*/
+
+SRWVector& Eigen3Vector::operator+ (SRWVector& v){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
+    ret_v.vector = this->vector + dynamic_cast<Eigen3Vector&>(v).vector;
+    return ret_v;
 }
 
-Eigen3Vector* Eigen3Vector::operator+ (const Eigen3Vector* v2){
-    Eigen3Vector* v = new Eigen3Vector(1);
-    v->vector = this->vector + v2->vector;
-    return v;
-}
-
-Eigen3Vector* Eigen3Vector::operator- (const Eigen3Vector* v2){
-    Eigen3Vector* v = new Eigen3Vector(1);
-    v->vector = this->vector - v2->vector;
-    return v;
+SRWVector& Eigen3Vector::operator- (SRWVector& v){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
+    ret_v.vector = this->vector - dynamic_cast<Eigen3Vector&>(v).vector;
+    return ret_v;
 }
 
 Eigen3Vector::~Eigen3Vector(){
