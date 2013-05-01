@@ -9,6 +9,8 @@ public:
     virtual int rows() = 0;
     virtual int cols() = 0;
 
+    virtual void print() = 0;
+
     virtual SRWVector& diag(int diagnum) = 0;
     virtual bool setDiag(int diagnum, SRWVector& v) = 0;
 

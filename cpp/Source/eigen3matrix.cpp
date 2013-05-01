@@ -13,6 +13,10 @@ int Eigen3Matrix::cols(){
     return this->matrix.cols();
 }
 
+void Eigen3Matrix::print(){
+    std::cout << this->matrix << std::endl << std::endl;
+}
+
 SRWVector& Eigen3Matrix::diag(int diagnum){
     Eigen3Vector& ret_v = *(new Eigen3Vector(1));
     ret_v.vector = this->matrix.diagonal(diagnum);

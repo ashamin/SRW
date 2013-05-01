@@ -5,6 +5,9 @@
 #include "Headers/eigen3matrix.h"
 #include "Eigen/Dense"
 
+#include <iostream>
+#include "stdio.h"
+
 using namespace Eigen;
 
 class Eigen3Vector : public SRWVector
@@ -14,6 +17,10 @@ public:
     ~Eigen3Vector();
 
     virtual int length();
+
+    virtual void resize(int length);
+
+    virtual void print();
 
     virtual SRWVector& segment(int index, int length);
 
@@ -25,6 +32,13 @@ public:
 
     virtual double& operator [](int index);
     virtual double& operator ()(int index);
+
+    /*virtual SRWVector& glue(double* x, SRWVector& v);
+    virtual SRWVector& glue(SRWVector& v, double* x);*/
+    virtual SRWVector& glue(SRWVector& v1, SRWVector& v2);
+
+
+
 
     VectorXd getVector(){
         return this->vector;

@@ -6,6 +6,9 @@
 #include "Headers/eigen3vector.h"
 #include "Eigen/Dense"
 
+#include <iostream>
+#include "stdio.h"
+
 using namespace Eigen;
 
 class Eigen3Matrix : public SRWMatrix
@@ -15,6 +18,8 @@ public:
 
     virtual int rows();
     virtual int cols();
+
+    virtual void print();
 
     virtual SRWVector& diag(int diagnum);
     virtual bool setDiag(int diagnum, SRWVector& v);
