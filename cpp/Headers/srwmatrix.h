@@ -11,11 +11,18 @@ public:
 
     virtual void print() = 0;
 
+    virtual void setZero() = 0;
+    virtual void setOne() = 0;
+
     virtual SRWVector& diag(int diagnum) = 0;
     virtual bool setDiag(int diagnum, SRWVector& v) = 0;
 
     virtual SRWMatrix& transpose() = 0;
     virtual SRWMatrix& inverse() = 0;
+
+    virtual SRWMatrix& diag_m() = 0;
+    virtual SRWMatrix& lower_tri(bool strictly) = 0;
+    virtual SRWMatrix& upper_tri(bool strictly) = 0;
 
     virtual SRWMatrix& operator= (SRWMatrix& m) = 0;
 
@@ -23,6 +30,9 @@ public:
     virtual SRWVector& operator* (SRWVector& v) = 0;
     virtual SRWMatrix& operator+ (SRWMatrix& m) = 0;
     virtual SRWMatrix& operator- (SRWMatrix& m) = 0;
+
+    virtual SRWMatrix& operator *(double c) = 0;
+    virtual SRWMatrix& operator /(double c) = 0;
 
     //virtual SRWVector& operator [](int index) = 0;
     virtual double& operator ()(int row, int column) = 0;

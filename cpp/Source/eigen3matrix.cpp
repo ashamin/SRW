@@ -17,6 +17,19 @@ void Eigen3Matrix::print(){
     std::cout << this->matrix << std::endl << std::endl;
 }
 
+void Eigen3Matrix::setZero(){
+    for (int i = 0; i< this->rows(); i++)
+        for (int j = 0; j<this->cols(); j++)
+            this->matrix(i, j) = 0;
+}
+
+void Eigen3Matrix::setOne(){
+    for (int i = 0; i< this->rows(); i++)
+        for (int j = 0; j<this->cols(); j++)
+            this->matrix(i, j) = 1;
+}
+
+
 SRWVector& Eigen3Matrix::diag(int diagnum){
     Eigen3Vector& ret_v = *(new Eigen3Vector(1));
     ret_v.vector = this->matrix.diagonal(diagnum);
@@ -41,6 +54,31 @@ SRWMatrix& Eigen3Matrix::inverse(){
     Eigen3Matrix& m = *(new Eigen3Matrix(this->cols(), this->rows()));
     m.matrix = this->matrix.inverse();
     return m;
+}
+
+SRWMatrix& Eigen3Matrix::diag_m(){
+    SRWMatrix& ret_m = *(new Eigen3Matrix(this->rows(), this->cols()));
+    ret_m.setZero();
+    ret_m.setDiag(0, this->diag(0));
+    return ret_m;
+}
+
+SRWMatrix& Eigen3Matrix::lower_tri(bool strictly){
+    Eigen3Matrix& ret_m = *(new Eigen3Matrix(this->rows(), this->cols()));
+    if (strictly)
+        ret_m.matrix = this->matrix.triangularView<StrictlyLower>();
+    else
+        ret_m.matrix = this->matrix.triangularView<Lower>();
+    return ret_m;
+}
+
+SRWMatrix& Eigen3Matrix::upper_tri(bool strictly){
+    Eigen3Matrix& ret_m = *(new Eigen3Matrix(this->rows(), this->cols()));
+    if (strictly)
+        ret_m.matrix = this->matrix.triangularView<StrictlyUpper>();
+    else
+        ret_m.matrix = this->matrix.triangularView<Upper>();
+    return ret_m;
 }
 
 SRWMatrix& Eigen3Matrix::operator =(SRWMatrix& m){
@@ -74,6 +112,18 @@ SRWMatrix& Eigen3Matrix::operator +(SRWMatrix& m){
 SRWMatrix& Eigen3Matrix::operator -(SRWMatrix& m){
     Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
     ret_m.matrix = this->matrix * dynamic_cast<Eigen3Matrix&>(m).matrix;
+    return ret_m;
+}
+
+SRWMatrix& Eigen3Matrix::operator *(double c){
+    Eigen3Matrix& ret_m = *(new Eigen3Matrix(this->rows(), this->cols()));
+    ret_m.matrix = this->matrix * c;
+    return ret_m;
+}
+
+SRWMatrix& Eigen3Matrix::operator /(double c){
+    Eigen3Matrix& ret_m = *(new Eigen3Matrix(this->rows(), this->cols()));
+    ret_m.matrix = this->matrix / c;
     return ret_m;
 }
 

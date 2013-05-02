@@ -11,6 +11,7 @@
 
 #include "Headers/solvers.h"
 #include "tests/Poisson2DSquareArea/Poisson2DSquareAreaTests"
+#include "Headers/preconditioners.h"
 
 //using namespace Eigen;
 using namespace std;
@@ -54,7 +55,7 @@ int main(int argc, char *argv[])
 
     cout << dynamic_cast<Eigen3Matrix&>(im * m).getMatrix() << endl << endl;*/
 
-    int n = 1000;
+    /*int n = 1000;
 
     SRWVector& x = *(new Eigen3Vector(n));
     SRWMatrix& A = *(new Eigen3Matrix(n, n));
@@ -71,7 +72,13 @@ int main(int argc, char *argv[])
 
     x = TDMA(A, x, b);
 
-    (A*x-b).print();
+    (A*x-b).print();*/
+
+    SRWMatrix& m = *(new Eigen3Matrix(5, 5));
+    m.print();
+    Preconditioners::SSOR_precond(m, 1).print();
+    m.print();
+
 
     return 0;
 }
