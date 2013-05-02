@@ -26,4 +26,7 @@ SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
 
 SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b);
 
+SRWVector& MINCORR(SRWMatrix& A, SRWVector& b, SRWMatrix& P,
+                   SRWVector& x, double epsilon, int maxit);
+
 #endif // SOLVERS_H

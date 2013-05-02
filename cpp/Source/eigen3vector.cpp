@@ -23,6 +23,10 @@ SRWVector& Eigen3Vector::segment(int index, int length){
     return v;
 }
 
+double Eigen3Vector::dot(SRWVector& v){
+    return this->vector.dot(dynamic_cast<Eigen3Vector&>(v).vector);
+}
+
 SRWVector& Eigen3Vector::operator= (SRWVector& v){
     if (this == &v)
         return *this;

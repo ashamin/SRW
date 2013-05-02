@@ -24,6 +24,8 @@ public:
 
     virtual SRWVector& segment(int index, int length);
 
+    virtual double dot(SRWVector& v);
+
     virtual SRWVector& operator= (SRWVector& v);
 
     //virtual SRWVector& operator* (SRWVector& v);

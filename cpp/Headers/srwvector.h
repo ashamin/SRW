@@ -20,6 +20,8 @@ public:
      */
     virtual SRWVector& segment(int index, int length) = 0;
 
+    virtual double dot(SRWVector& v) = 0;
+
     virtual SRWVector& operator= (SRWVector& v) = 0;
     //still didn't found how transpose vector.
     //virtual SRWVector& operator* (SRWVector& v) = 0;

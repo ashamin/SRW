@@ -10,6 +10,8 @@
 #include "Headers/eigen3matrix.h"
 
 #include "Headers/solvers.h"
+#include "tests/Test2DPoissonSquareArea.h"
+#include "tests/Test2DPoissonSquareAreaN1.h"
 
 //using namespace Eigen;
 using namespace std;
@@ -53,7 +55,7 @@ int main(int argc, char *argv[])
 
     cout << dynamic_cast<Eigen3Matrix&>(im * m).getMatrix() << endl << endl;*/
 
-    int n = 1000;
+    /*int n = 1000;
 
     SRWVector& x = *(new Eigen3Vector(n));
     SRWMatrix& A = *(new Eigen3Matrix(n, n));
@@ -70,7 +72,15 @@ int main(int argc, char *argv[])
 
     x = TDMA(A, x, b);
 
-    (A*x-b).print();
+    (A*x-b).print();*/
+
+    VectorXd v1 = VectorXd::Random(5);
+    VectorXd v2 = VectorXd::Random(5);
+
+    cout << v1.dot(v2) << endl;
+
+
+    Test2DPoissonSquareAreaN1 &t = * (new Test2DPoissonSquareAreaN1());
 
 
     return 0;
