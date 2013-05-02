@@ -1,0 +1,6 @@
+#include "tests/Poisson2DSquareArea/Test2DPoissonSquareArea.h"
+#include "tests/Poisson2DSquareArea/Test2DPoissonSquareAreaN1.h"
+#include "tests/Poisson2DSquareArea/Test2DPoissonSquareAreaN2.h"
+#include "tests/Poisson2DSquareArea/Test2DPoissonSquareAreaN3.h"
+#include "tests/Poisson2DSquareArea/Test2DPoissonSquareAreaN4.h"
+#include "tests/Poisson2DSquareArea/Test2DPoissonSquareAreaN5.h"

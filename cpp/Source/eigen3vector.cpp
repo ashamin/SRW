@@ -1,4 +1,5 @@
 #include "Headers/eigen3vector.h"
+#include "math.h"
 
 Eigen3Vector::Eigen3Vector(int length)
 {
@@ -27,6 +28,17 @@ double Eigen3Vector::dot(SRWVector& v){
     return this->vector.dot(dynamic_cast<Eigen3Vector&>(v).vector);
 }
 
+SRWVector& Eigen3Vector::absv(){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
+    for (int i = 0; i<this->length(); i++)
+        ret_v(i) = abs(this->vector(i));
+    return ret_v;
+}
+
+double Eigen3Vector::maxv(){
+    return this->vector.maxCoeff();
+}
+
 SRWVector& Eigen3Vector::operator= (SRWVector& v){
     if (this == &v)
         return *this;
@@ -51,6 +63,18 @@ SRWVector& Eigen3Vector::operator+ (SRWVector& v){
 SRWVector& Eigen3Vector::operator- (SRWVector& v){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
     ret_v.vector = this->vector - dynamic_cast<Eigen3Vector&>(v).vector;
+    return ret_v;
+}
+
+SRWVector& Eigen3Vector::operator *(double c){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
+    ret_v.vector = this->vector * c;
+    return ret_v;
+}
+
+SRWVector& Eigen3Vector::operator /(double c){
+    Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
+    ret_v.vector = this->vector / c;
     return ret_v;
 }
 

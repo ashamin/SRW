@@ -26,11 +26,17 @@ public:
 
     virtual double dot(SRWVector& v);
 
+    virtual SRWVector& absv();
+    virtual double maxv();
+
     virtual SRWVector& operator= (SRWVector& v);
 
     //virtual SRWVector& operator* (SRWVector& v);
     virtual SRWVector& operator+ (SRWVector& v);
     virtual SRWVector& operator- (SRWVector& v);
+
+    virtual SRWVector& operator *(double c);
+    virtual SRWVector& operator /(double c);
 
     virtual double& operator [](int index);
     virtual double& operator ()(int index);

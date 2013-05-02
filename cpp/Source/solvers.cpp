@@ -62,9 +62,29 @@ SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b){
 }
 
 
-SRWVector& MINCORR(SRWMatrix& A, SRWVector& b, SRWMatrix& P,
-                   SRWVector& x, double epsilon, int maxit){
+SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, SRWMatrix& P,
+                   SRWVector& x, double epsilon, int &maxit){
+    double tau = 1;
     SRWMatrix& iP = P.inverse();
+
+    SRWVector& r = (f - A*x);
+    SRWVector& w = iP*r;
+    SRWVector& Aw = A*w;
+
+    while(maxit-- > 0){
+
+        tau = Aw.dot(w) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
+
+        x = x + w*tau;
+
+        r = (f - A*x);
+        w = iP*r;
+        Aw = A*w;
+
+        if (r.absv().maxv() < epsilon) break;
+        if (maxit == 0)
+            std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
+    }
 
     return x;
 }

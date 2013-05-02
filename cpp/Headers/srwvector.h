@@ -22,11 +22,17 @@ public:
 
     virtual double dot(SRWVector& v) = 0;
 
+    virtual SRWVector& absv() = 0;
+    virtual double maxv() = 0;
+
     virtual SRWVector& operator= (SRWVector& v) = 0;
     //still didn't found how transpose vector.
     //virtual SRWVector& operator* (SRWVector& v) = 0;
     virtual SRWVector& operator+ (SRWVector& v) = 0;
     virtual SRWVector& operator- (SRWVector& v) = 0;
+
+    virtual SRWVector& operator *(double c) = 0;
+    virtual SRWVector& operator /(double c) = 0;
 
     virtual double& operator [](int index) = 0;
     virtual double& operator ()(int index) = 0;
