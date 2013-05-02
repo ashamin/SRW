@@ -34,6 +34,7 @@ SSOR.precond.approach1 <- function(A, w){
   U <- A
   L[upper.tri(L, diag=TRUE)]=0
   U[lower.tri(L, diag=TRUE)]=0
+  (D/w + L) %*% ((w/(2-w))*solve(D)) %*% (D/w + U) 
 }
 
 #Symmetric Successive Over Relaxation
