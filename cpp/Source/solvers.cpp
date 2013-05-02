@@ -1,94 +1,70 @@
 
 #include "Headers/solvers.h"
+#include "Headers/eigen3matrix.h"
 
+SRWMatrix& form_A_matrix(int n, double h1, double h2,
+                         int I){
+    SRWMatrix& A = *(new Eigen3Matrix(n, n));
+    A.setZero();
 
-/**
- * @brief TDMA_d
- *          Tridiagonal Matrix Algorithm
- * @param a
- *          lower diagonal
- * @param b
- *          main diagonal
- * @param c
- *          upper diagonal
- * @param d
- *          right part equation vector
- * @param x
- *          result vector x from Ax = d
- * @return
- *          vector x from Ax = d
- */
-SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
-                  SRWVector& c, SRWVector& d, SRWVector& x){
+    SRWVector& tmp_d = A.diag(0);
+    tmp_d.fill(-(2/(h1*h1) + 2/(h2*h2)));
+    A.setDiag(0, tmp_d);
 
-    SRWVector& r_part = *(new Eigen3Vector(d.length()));
-    r_part = d;
-    int n = d.length();
-    x.resize(n);
-    double *tmp = new double[1];
-    *tmp = 0;
-    SRWVector& null_v = *(new Eigen3Vector(1));
-    null_v(0) = 0;
+    tmp_d = A.diag(1);
+    tmp_d.fill(1/(h1*h1));
+    for (int i = I-3; i<tmp_d.length(); i+=I-2)
+        tmp_d(i) = 0;
+    A.setDiag(1, tmp_d);
+    A.setDiag(-1, tmp_d);
 
-    a = a.glue(null_v, a);
-    c = c.glue(c, null_v);
+    tmp_d = A.diag(I-2);
+    tmp_d.fill(1/(h2*h2));
+    A.setDiag(I-2, tmp_d);
+    A.setDiag(-(I-2), tmp_d);
 
-    /*a = a.glue(tmp, a);
-    c = a.glue(c, tmp);*/
-
-    c(0) = c(0)/b(0);
-    d(0) = d(0)/b(0);
-
-    for (int i = 1; i<n; i++){
-        *tmp = b(i) - c(i-1)*a(i);
-        c(i) = c(i) / *tmp;
-        d(i) = (d(i) - d(i-1)*a(i)) / *tmp;
-    }
-
-    x(n-1) = d(n-1);
-    for (int i = n-2; i>=0; i--)
-        x(i) = d(i) - c(i)*x(i+1);
-
-    d = r_part;
-
-    delete tmp, &null_v, &r_part;
-
-    return x;
+    return A;
 }
 
 
-SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b){
-    return TDMA_d(A.diag(-1), A.diag(0), A.diag(1), b, x);
+SRWVector& form_b_vector(Test2DPoissonSquareArea& test, int n,
+                         double h1, double h2, int I, int J,
+                         SRWVector& x, SRWVector& y){
+    SRWVector& b = *(new Eigen3Vector(n));
+    b.fill(0);
+    int k = 0;
+
+    for (int j = 1; j<J-1; j++)
+        for (int i = 1; i<I-1; i++){
+            k = (I-2)*(j-1) + (i-1);
+            b(k) = -test.f(x(i), y(j));
+            if (j == 1) b(k) = b(k) - test.g3(x(i))/(h2*h2);
+            if (j == (J-2)) b(k) = b(k) - test.g4(x(i))/(h2*h2);
+            if (i == 1) b(k) = b(k) - test.g1(y(j))/(h1*h1);
+            if (i == (I-2)) b(k) = b(k) - test.g2(y(j))/(h1*h1);
+        }
+
+    return b;
 }
 
+SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
+                                 int I, int J){
+    double h1 = test.a / (I-1), h2 = test.b / (J-1);
+    SRWVector& x = *(new Eigen3Vector(I));
+    SRWVector& y = *(new Eigen3Vector(J));
 
-SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, SRWMatrix& P,
-                   SRWVector& x, double epsilon, int &maxit){
-    double tau = 1;
-    SRWMatrix& iP = P.inverse();
+    for (int i = 0; i<I; i++)
+        x(i) = 0 + i*h1;
+    for (int j = 0; j<J; j++)
+        y(j) = 0 + j*h2;
 
-    SRWVector& r = (f - A*x);
-    SRWVector& w = iP*r;
-    SRWVector& Aw = A*w;
+    int n = (I-2)*(J-2);
 
-    while(maxit-- > 0){
+    SRWMatrix& A = form_A_matrix(n, h1, h2, I);
 
-        tau = Aw.dot(w) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
+    SRWVector& b = form_b_vector(test, n, h1, h2, I, J, x, y);
 
-        x = x + w*tau;
-
-        r = (f - A*x);
-        w = iP*r;
-        Aw = A*w;
-
-        if (r.absv().maxv() < epsilon) break;
-        if (maxit == 0)
-            std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
-    }
-
-    return x;
+    return A;
 }
-
-
 
 

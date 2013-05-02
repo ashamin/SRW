@@ -22,6 +22,8 @@ public:
 
     virtual void print();
 
+    virtual void fill(double value);
+
     virtual SRWVector& segment(int index, int length);
 
     virtual double dot(SRWVector& v);

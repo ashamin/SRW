@@ -10,6 +10,8 @@ public:
 
     virtual void print() = 0;
 
+    virtual void fill(double value) = 0;
+
     /**
      * @brief segment
      * @param index

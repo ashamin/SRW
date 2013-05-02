@@ -18,6 +18,11 @@ void Eigen3Vector::print(){
     std::cout << this->vector << std::endl << std::endl;
 }
 
+void Eigen3Vector::fill(double value){
+    for (int i = 0; i<this->length(); i++)
+        this->vector(i) = value;
+}
+
 SRWVector& Eigen3Vector::segment(int index, int length){
     Eigen3Vector& v = *(new Eigen3Vector(length));
     v.vector = this->vector.segment(index, length);

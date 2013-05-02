@@ -24,7 +24,7 @@ public:
     }
 
     virtual double g3(double x){
-        return x + 4*x*x;
+        return x + 3*x*x;
     }
 
     virtual double g4(double x){

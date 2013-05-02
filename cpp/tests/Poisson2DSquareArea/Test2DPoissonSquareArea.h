@@ -13,7 +13,6 @@ public:
 
     virtual double right_answer(double x, double y) = 0;
 
-protected:
     double a, b;
 };
 

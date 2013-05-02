@@ -9,9 +9,11 @@
 #include "Headers/srwmatrix.h"
 #include "Headers/eigen3matrix.h"
 
-#include "Headers/solvers.h"
+#include "Headers/lsolvers.h"
 #include "tests/Poisson2DSquareArea/Poisson2DSquareAreaTests"
 #include "Headers/preconditioners.h"
+
+#include "Headers/solvers.h"
 
 //using namespace Eigen;
 using namespace std;
@@ -74,10 +76,13 @@ int main(int argc, char *argv[])
 
     (A*x-b).print();*/
 
-    SRWMatrix& m = *(new Eigen3Matrix(5, 5));
+    /*SRWMatrix& m = form_A_matrix(4, .5, .5, 4);
     m.print();
-    Preconditioners::SSOR_precond(m, 1).print();
-    m.print();
+    m = form_A_matrix(16, .5, .5, 6);
+    m.print();*/
+
+    solve_poiss_2D_square(*(new Test2DPoissonSquareAreaN1), 8, 8);
+
 
 
     return 0;

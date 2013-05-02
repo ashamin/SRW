@@ -1,32 +1,18 @@
 #ifndef SOLVERS_H
 #define SOLVERS_H
 
-#include "Headers/srwvector.h"
-#include "Headers/srwmatrix.h"
-#include "Headers/eigen3vector.h"
+#include "srwmatrix.h"
+#include "tests/Poisson2DSquareArea/Test2DPoissonSquareArea.h"
 
-/**
- * @brief TDMA_d
- *          Tridiagonal Matrix Algorithm
- * @param a
- *          lower diagonal
- * @param b
- *          main diagonal
- * @param c
- *          upper diagonal
- * @param d
- *          right part equation vector
- * @param x
- *          result vector x from Ax = d
- * @return
- *          vector x from Ax = d
- */
-SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
-                  SRWVector& c, SRWVector& d, SRWVector& x);
+SRWMatrix& form_A_matrix(int n, double h1, double h2,
+                         int I);
 
-SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b);
+SRWVector& form_b_vector(Test2DPoissonSquareArea& test, int n,
+                         int I, int J, double h1, double h2,
+                         SRWVector& x, SRWVector& y);
 
-SRWVector& MINCORR(SRWMatrix& A, SRWVector& b, SRWMatrix& P,
-                   SRWVector& x, double epsilon, int maxit);
+SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
+                                 int I, int J);
+
 
 #endif // SOLVERS_H
