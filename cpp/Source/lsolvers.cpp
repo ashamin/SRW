@@ -63,7 +63,7 @@ SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b){
 
 
 SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, SRWMatrix& P,
-                   SRWVector& x, double epsilon, int &maxit){
+                   SRWVector& x, double epsilon, int maxit){
     double tau = 1;
     SRWMatrix& iP = P.inverse();
 

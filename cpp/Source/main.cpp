@@ -86,11 +86,12 @@ int main(int argc, char *argv[])
 
         //////// ПЕРЕНОСИМ split в SRWVECTOR!!!!!!!!!!!!!!!!!!!
 
-    SRWVector& v = *(new Eigen3Vector(25));
+    /*SRWVector& v = *(new Eigen3Vector(25));
     SRWMatrix& m = *(new Eigen3Matrix(1, 1));
     m = m.split(v, 5, true);
-    m.print();
+    m.print();*/
 
+    solve_poiss_2D_square(*(new Test2DPoissonSquareAreaN1), 9, 9).print();
 
 
     return 0;

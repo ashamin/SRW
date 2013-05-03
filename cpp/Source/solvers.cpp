@@ -1,5 +1,7 @@
 
 #include "Headers/solvers.h"
+#include "Headers/lsolvers.h"
+#include "Headers/preconditioners.h"
 #include "Headers/eigen3matrix.h"
 
 SRWMatrix& form_A_matrix(int n, double h1, double h2,
@@ -63,6 +65,12 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     SRWMatrix& A = form_A_matrix(n, h1, h2, I);
 
     SRWVector& b = form_b_vector(test, n, h1, h2, I, J, x, y);
+
+    SRWVector& solve = *(new Eigen3Vector(A.cols()));
+
+    solve = MINCORR(A, b, Preconditioners::SSOR_precond(A, .7), solve, 1e-5, 400);
+
+    A = A.split(solve, I-2, true);
 
     return A;
 }
