@@ -44,6 +44,19 @@ bool Eigen3Matrix::setDiag(int diagnum, SRWVector &v){
     return false;
 }
 
+SRWMatrix& Eigen3Matrix::split(SRWVector& v, int length, bool byrow){
+    int n = v.length()/length, m = length;
+    SRWMatrix& ret_m =  *(new Eigen3Matrix(n, m));
+
+    for (int i = 0; i<n; i++)
+        for (int j = 0; j<m; j++)
+            ret_m(i, j) = v(i*m + j);
+
+    if (!byrow) ret_m = ret_m.transpose();
+
+    return ret_m;
+}
+
 SRWMatrix& Eigen3Matrix::transpose(){
     Eigen3Matrix& m = *(new Eigen3Matrix(this->cols(), this->rows()));
     m.matrix = this->matrix.transpose();
@@ -89,6 +102,10 @@ SRWMatrix& Eigen3Matrix::operator =(SRWMatrix& m){
         this->matrix = dynamic_cast<Eigen3Matrix&>(m).matrix;
         return *this;
     }
+}
+
+bool Eigen3Matrix::operator ==(SRWMatrix& m){
+    return this->matrix == dynamic_cast<Eigen3Matrix&>(m).matrix;
 }
 
 SRWMatrix& Eigen3Matrix::operator *(SRWMatrix& m){

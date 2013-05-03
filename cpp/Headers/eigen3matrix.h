@@ -27,6 +27,8 @@ public:
     virtual SRWVector& diag(int diagnum);
     virtual bool setDiag(int diagnum, SRWVector& v);
 
+    virtual SRWMatrix& split(SRWVector& v, int length, bool byrow);
+
     virtual SRWMatrix& transpose();
     virtual SRWMatrix& inverse();
 
@@ -35,6 +37,9 @@ public:
     virtual SRWMatrix& upper_tri(bool strictly);
 
     virtual SRWMatrix& operator= (SRWMatrix& m);
+
+    virtual bool operator ==(SRWMatrix& m);
+
     virtual SRWMatrix& operator *(SRWMatrix& m);
     virtual SRWVector& operator *(SRWVector& v);
     virtual SRWMatrix& operator +(SRWMatrix& m);

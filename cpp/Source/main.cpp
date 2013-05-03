@@ -81,7 +81,15 @@ int main(int argc, char *argv[])
     m = form_A_matrix(16, .5, .5, 6);
     m.print();*/
 
-    solve_poiss_2D_square(*(new Test2DPoissonSquareAreaN1), 8, 8);
+    //solve_poiss_2D_square(*(new Test2DPoissonSquareAreaN1), 8, 8);
+
+
+        //////// ПЕРЕНОСИМ split в SRWVECTOR!!!!!!!!!!!!!!!!!!!
+
+    SRWVector& v = *(new Eigen3Vector(25));
+    SRWMatrix& m = *(new Eigen3Matrix(1, 1));
+    m = m.split(v, 5, true);
+    m.print();
 
 
 

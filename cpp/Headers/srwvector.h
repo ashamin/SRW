@@ -28,6 +28,8 @@ public:
     virtual double maxv() = 0;
 
     virtual SRWVector& operator= (SRWVector& v) = 0;
+
+    virtual bool operator ==(SRWVector& v) = 0;
     //still didn't found how transpose vector.
     //virtual SRWVector& operator* (SRWVector& v) = 0;
     virtual SRWVector& operator+ (SRWVector& v) = 0;

@@ -33,6 +33,8 @@ public:
 
     virtual SRWVector& operator= (SRWVector& v);
 
+    virtual bool operator ==(SRWVector& v);
+
     //virtual SRWVector& operator* (SRWVector& v);
     virtual SRWVector& operator+ (SRWVector& v);
     virtual SRWVector& operator- (SRWVector& v);

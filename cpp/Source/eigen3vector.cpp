@@ -53,6 +53,10 @@ SRWVector& Eigen3Vector::operator= (SRWVector& v){
     }
 }
 
+bool Eigen3Vector::operator ==(SRWVector& v){
+    return this->vector == dynamic_cast<Eigen3Vector&>(v).vector;
+}
+
 /*SRWVector& Eigen3Vector::operator* (SRWVector& v){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
     ret_v.vector = this->vector * dynamic_cast<Eigen3Vector&>(v).vector;
