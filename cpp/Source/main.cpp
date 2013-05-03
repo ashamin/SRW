@@ -91,7 +91,22 @@ int main(int argc, char *argv[])
     m = m.split(v, 5, true);
     m.print();*/
 
-    solve_poiss_2D_square(*(new Test2DPoissonSquareAreaN1), 9, 9).print();
+    /*int I = 8, J = 8;
+    Test2DPoissonSquareAreaN1& test = *(new Test2DPoissonSquareAreaN1);
+
+    solve_poiss_2D_square(test, I, J).print();
+
+    test.get_right_answer_as_matrix(I, J).print();*/
+
+    MatrixXd m = MatrixXd::Random(2, 2);
+    m(0, 0) = 1.3;
+    m(0, 1) = 5.5;
+    m(1, 0) = 1.7;
+    m(1, 1) = 6.9;
+    cout << m << endl << endl;
+    cout << m.norm() << endl;
+
+
 
 
     return 0;
