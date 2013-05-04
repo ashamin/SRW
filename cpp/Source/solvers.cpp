@@ -1,7 +1,7 @@
 
 #include "Headers/solvers.h"
 #include "Headers/lsolvers.h"
-#include "Headers/preconditioners.h"
+#include "Headers/Preconditioning/preconditioners.h"
 #include "Headers/eigen3matrix.h"
 
 SRWMatrix& form_A_matrix(int n, double h1, double h2,

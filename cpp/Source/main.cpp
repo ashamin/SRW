@@ -11,9 +11,12 @@
 
 #include "Headers/lsolvers.h"
 #include "tests/Poisson2DSquareArea/Poisson2DSquareAreaTests"
-#include "Headers/preconditioners.h"
+#include "Headers/Preconditioning/preconditioners.h"
 
 #include "Headers/solvers.h"
+
+#include "Headers/Preconditioning/preconditioner.h"
+#include "Headers/Preconditioning/par2DPreconditioner.h"
 
 //using namespace Eigen;
 using namespace std;
@@ -91,26 +94,20 @@ int main(int argc, char *argv[])
     m = m.split(v, 5, true);
     m.print();*/
 
-    int I = 20, J = 20;
+    /*int I = 10, J = 10;
     Test2DPoissonSquareAreaN1& test = *(new Test2DPoissonSquareAreaN1);
 
     SRWMatrix& sl = solve_poiss_2D_square(test, I, J);
 
     SRWMatrix& ra = test.get_right_answer_as_matrix(I, J);
 
-    cout << (ra - sl).norm("F")/sl.norm("F") << endl << endl;
+    cout << (ra - sl).norm("F")/sl.norm("F") << endl << endl;*/
 
-    /*MatrixXd m = MatrixXd::Random(2, 2);
-    m(0, 0) = 1.3;
-    m(0, 1) = 5.5;
-    m(1, 0) = 1.7;
-    m(1, 1) = 6.9;
-    cout << m << endl << endl;
-    cout << m.norm() << endl;*/
 
-    /*SRWVector& v = *(new Eigen3Vector(10));
-    v.print();
-    cout << v.norm("m") << endl << endl;*/
+    par2DPreconditioner& p = *(new par2DPreconditioner(.8, 9, .11, "par.SSOR"));
+
+    p.P().print();
+
 
     return 0;
 }

@@ -58,7 +58,7 @@ relax.precond <- function(A, w){
   P
 }
 
-SSOR.par <- function(w, n, I, h){
+SSOR.par <- function(w, n, h){
   Mx <- matrix(rep(0, times=n^2), n, n)
   
   d <- diag(Mx)
