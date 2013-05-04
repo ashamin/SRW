@@ -27,6 +27,7 @@ public:
     virtual SRWVector& segment(int index, int length);
 
     virtual double dot(SRWVector& v);
+    virtual double norm(std::string n_type);
 
     virtual SRWVector& absv();
     virtual double maxv();

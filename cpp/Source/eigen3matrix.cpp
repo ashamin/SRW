@@ -57,6 +57,14 @@ SRWMatrix& Eigen3Matrix::split(SRWVector& v, int length, bool byrow){
     return ret_m;
 }
 
+double Eigen3Matrix::norm(std::string n_type){
+    if (n_type == "f" || n_type == "F"){
+        return this->matrix.norm();
+    }
+    else return 0;
+}
+
+
 SRWMatrix& Eigen3Matrix::transpose(){
     Eigen3Matrix& m = *(new Eigen3Matrix(this->cols(), this->rows()));
     m.matrix = this->matrix.transpose();
@@ -128,7 +136,7 @@ SRWMatrix& Eigen3Matrix::operator +(SRWMatrix& m){
 
 SRWMatrix& Eigen3Matrix::operator -(SRWMatrix& m){
     Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
-    ret_m.matrix = this->matrix * dynamic_cast<Eigen3Matrix&>(m).matrix;
+    ret_m.matrix = this->matrix - dynamic_cast<Eigen3Matrix&>(m).matrix;
     return ret_m;
 }
 

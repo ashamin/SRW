@@ -81,7 +81,7 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, SRWMatrix& P,
         w = iP*r;
         Aw = A*w;
 
-        if (r.absv().maxv() < epsilon) break;
+        if (r.norm("m") < epsilon) break;
         if (maxit == 0)
             std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }

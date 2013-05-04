@@ -1,6 +1,8 @@
 #ifndef SRWVECTOR_H
 #define SRWVECTOR_H
 
+#include <string>
+
 class SRWVector
 {
 public:
@@ -23,6 +25,7 @@ public:
     virtual SRWVector& segment(int index, int length) = 0;
 
     virtual double dot(SRWVector& v) = 0;
+    virtual double norm(std::string n_type) = 0;
 
     virtual SRWVector& absv() = 0;
     virtual double maxv() = 0;

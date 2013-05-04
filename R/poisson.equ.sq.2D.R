@@ -122,11 +122,11 @@ slv.poisson <- function(a=a.test, b=b.test, g1=g1.test, g2=g2.test,
     
   b <- form.b(n, I, J, x, y, h1, h2, f, g1, g2, g3, g4)
   
-#   print.temperaturegrams(x, y, A, b, I, J)
+  print.temperaturegrams(x, y, A, b, I, J)
   
   #######hardcore parallel method!!!!!
-  source("experimental/slv.poisson.experimental.R")
-  print.temperaturegrams.par.method(x, y, A, b, I, J, n, h1);
+#   source("experimental/slv.poisson.experimental.R")
+#   print.temperaturegrams.par.method(x, y, A, b, I, J, n, h1);
   
 #   res = data.frame(solve = slv(A, b, P=SSOR.precond.approach1(A, .8), maxit=1000)$root, 
 #                   answer = get.res.vector(n, I, J, x, y))
@@ -172,7 +172,7 @@ print.temperaturegrams <- function(x, y, A, b, I, J){
   for (i in 2:(length(x)-1))
     for (j in 2:(length(y)-1))
       ra[i-1, j-1] = right.answer(x[i], y[j])
-  par(mfcol=c(1, 3))
+  par(mfcol=c(1, 2))
   
   s <- mincorr(A, b, P=SSOR.precond.approach1(A, 1), maxit=1000)
 #   s <- minres(A, b, P=SSOR.precond.approach1(A, 1), maxit=10000)
@@ -184,7 +184,7 @@ print.temperaturegrams <- function(x, y, A, b, I, J){
   image(x[2:(I-1)], y[2:(J-1)], ra)
   title("right answer")
   
-  print(data.frame(residual.norm=norm(ra - sl)/norm(sl), iteration.number=unique(s$it)))  
+  print(data.frame(residual.norm=norm(ra - sl, "F")/norm(sl, "F"), iteration.number=unique(s$it)))  
 }
 
 get.res.vector <- function(n, I, J, x, y){

@@ -29,6 +29,8 @@ public:
 
     virtual SRWMatrix& split(SRWVector& v, int length, bool byrow);
 
+    virtual double norm(std::string n_type);
+
     virtual SRWMatrix& transpose();
     virtual SRWMatrix& inverse();
 

@@ -91,23 +91,26 @@ int main(int argc, char *argv[])
     m = m.split(v, 5, true);
     m.print();*/
 
-    /*int I = 8, J = 8;
+    int I = 20, J = 20;
     Test2DPoissonSquareAreaN1& test = *(new Test2DPoissonSquareAreaN1);
 
-    solve_poiss_2D_square(test, I, J).print();
+    SRWMatrix& sl = solve_poiss_2D_square(test, I, J);
 
-    test.get_right_answer_as_matrix(I, J).print();*/
+    SRWMatrix& ra = test.get_right_answer_as_matrix(I, J);
 
-    MatrixXd m = MatrixXd::Random(2, 2);
+    cout << (ra - sl).norm("F")/sl.norm("F") << endl << endl;
+
+    /*MatrixXd m = MatrixXd::Random(2, 2);
     m(0, 0) = 1.3;
     m(0, 1) = 5.5;
     m(1, 0) = 1.7;
     m(1, 1) = 6.9;
     cout << m << endl << endl;
-    cout << m.norm() << endl;
+    cout << m.norm() << endl;*/
 
-
-
+    /*SRWVector& v = *(new Eigen3Vector(10));
+    v.print();
+    cout << v.norm("m") << endl << endl;*/
 
     return 0;
 }

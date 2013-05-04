@@ -33,10 +33,24 @@ double Eigen3Vector::dot(SRWVector& v){
     return this->vector.dot(dynamic_cast<Eigen3Vector&>(v).vector);
 }
 
+double Eigen3Vector::norm(std::string n_type){
+    if (n_type == "m" || n_type == "M"){
+        double max = 0;
+        double abs_v = 0;
+        int n = this->length();
+        for (int i = 0; i<n; i++){
+            abs_v = fabs(this->vector(i));
+            if (abs_v > max) max = abs_v;
+        }
+        return max;
+    }
+    else return 0;
+}
+
 SRWVector& Eigen3Vector::absv(){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
     for (int i = 0; i<this->length(); i++)
-        ret_v(i) = abs(this->vector(i));
+        ret_v(i) = fabs(this->vector(i));
     return ret_v;
 }
 
