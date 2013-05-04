@@ -10,6 +10,8 @@
 #include "Headers/srwvector.h"
 #include "Headers/srwmatrix.h"
 #include "Headers/eigen3vector.h"
+#include "Headers/Preconditioning/preconditioner.h"
+#include "Headers/Preconditioning/par2DPreconditioner.h"
 
 /**
  * @brief TDMA_d
@@ -32,7 +34,7 @@ SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
 
 SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b);
 
-SRWVector& MINCORR(SRWMatrix& A, SRWVector& b, SRWMatrix& P,
+SRWVector& MINCORR(SRWMatrix& A, SRWVector& b, Preconditioner& P,
                    SRWVector& x, double epsilon, int maxit);
 
 #endif // LSOLVERS_H

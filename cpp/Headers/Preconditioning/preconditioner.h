@@ -24,6 +24,8 @@ public:
             this->Pr = &((D/w + A.lower_tri(true))
                     * (D.inverse()*w)
                     * (D/w + A.upper_tri(true)));
+
+            this->iPr = &Pr->inverse();
         }
     }
 

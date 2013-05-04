@@ -94,19 +94,19 @@ int main(int argc, char *argv[])
     m = m.split(v, 5, true);
     m.print();*/
 
-    /*int I = 10, J = 10;
-    Test2DPoissonSquareAreaN1& test = *(new Test2DPoissonSquareAreaN1);
+    int I = 10, J = 10;
+    Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN5);
 
     SRWMatrix& sl = solve_poiss_2D_square(test, I, J);
 
     SRWMatrix& ra = test.get_right_answer_as_matrix(I, J);
 
-    cout << (ra - sl).norm("F")/sl.norm("F") << endl << endl;*/
+    cout << (ra - sl).norm("F")/sl.norm("F") << endl << endl;
 
 
-    par2DPreconditioner& p = *(new par2DPreconditioner(.8, 9, .11, "par.SSOR"));
+    /*par2DPreconditioner& p = *(new par2DPreconditioner(.8, 9, .11, "par.SSOR"));
 
-    p.P().print();
+    p.P().print();*/
 
 
     return 0;
