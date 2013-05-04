@@ -34,7 +34,10 @@ SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
 
 SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b);
 
-SRWVector& MINCORR(SRWMatrix& A, SRWVector& b, Preconditioner& P,
+SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
+                   SRWVector& x, double epsilon, int maxit);
+
+SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                    SRWVector& x, double epsilon, int maxit);
 
 #endif // LSOLVERS_H

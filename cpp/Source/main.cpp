@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     m.print();*/
 
     int I = 10, J = 10;
-    Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN5);
+    Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN1);
 
     SRWMatrix& sl = solve_poiss_2D_square(test, I, J);
 

@@ -89,6 +89,42 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
     return x;
 }
 
+SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
+                   SRWVector& x, double epsilon, int maxit){
+    double tau = 1;
+    SRWMatrix& iP = P.iP();
+
+    SRWVector& r = (f - A*x);
+    SRWVector& w = iP*r;
+    SRWVector& Aw = A*w;
+
+    SRWVector& tmp_v = *(new Eigen3Vector(P.Dx().cols()));
+    SRWVector& corr = *(new Eigen3Vector(P.Dy().cols()));
+
+    tmp_v = TDMA(P.Dx(), tmp_v, r);
+    corr = TDMA(P.Dy(), corr, tmp_v);
+
+    while(maxit-- > 0){
+
+        tau = Aw.dot(w) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
+
+        x = x + corr*tau;
+
+        r = (f - A*x);
+        w = iP*r;
+        Aw = A*w;
+
+        tmp_v = TDMA(P.Dx(), tmp_v, r);
+        corr = TDMA(P.Dy(), corr, tmp_v);
+
+        if (r.norm("m") < epsilon) break;
+        if (maxit == 0)
+            std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
+    }
+
+    return x;
+}
+
 
 
 
