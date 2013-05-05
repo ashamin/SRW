@@ -95,8 +95,6 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     SRWMatrix& iP = P.iP();
 
     SRWVector& r = (f - A*x);
-    SRWVector& w = iP*r;
-    SRWVector& Aw = A*w;
 
     SRWVector& tmp_v = *(new Eigen3Vector(P.Dx().cols()));
     SRWVector& corr = *(new Eigen3Vector(P.Dy().cols()));
@@ -104,18 +102,20 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     tmp_v = TDMA(P.Dx(), tmp_v, r);
     corr = TDMA(P.Dy(), corr, tmp_v);
 
+    SRWVector& Aw = A*corr;
+
     while(maxit-- > 0){
 
-        tau = Aw.dot(w) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
+        tau = Aw.dot(corr) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
 
         x = x + corr*tau;
 
         r = (f - A*x);
-        w = iP*r;
-        Aw = A*w;
 
         tmp_v = TDMA(P.Dx(), tmp_v, r);
         corr = TDMA(P.Dy(), corr, tmp_v);
+
+        Aw = A*corr;
 
         if (r.norm("m") < epsilon) break;
         if (maxit == 0)

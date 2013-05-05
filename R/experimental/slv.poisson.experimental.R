@@ -24,5 +24,5 @@ print.temperaturegrams.par.method <- function(x, y, A, b, I, J, n, h){
   image(x[2:(I-1)], y[2:(J-1)], ra)
   title("right answer")
   
-  print(data.frame(residual.norm=norm(ra - sl)/norm(sl), iteration.number=unique(s$it)))  
+  print(data.frame(residual.norm=norm(ra - sl, "F")/norm(sl, "F"), iteration.number=unique(s$it)))  
 }
