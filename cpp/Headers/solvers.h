@@ -12,7 +12,7 @@ SRWVector& form_b_vector(Test2DPoissonSquareArea& test, int n,
                          SRWVector& x, SRWVector& y);
 
 SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
-                                 int I, int J);
+                                 int I, int J, int &maxit);
 
 
 #endif // SOLVERS_H

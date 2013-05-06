@@ -63,7 +63,9 @@ SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b){
 
 
 SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
-                   SRWVector& x, double epsilon, int maxit){
+                   SRWVector& x, double epsilon, int &maxit){
+    double max_it_local = maxit;
+    maxit = 0;
     double tau = 1;
     SRWMatrix& iP = P.iP();
 
@@ -71,7 +73,7 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
     SRWVector& w = iP*r;
     SRWVector& Aw = A*w;
 
-    while(maxit-- > 0){
+    while(maxit++ < max_it_local){
 
         tau = Aw.dot(w) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
 
@@ -82,7 +84,7 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
         Aw = A*w;
 
         if (r.norm("m") < epsilon) break;
-        if (maxit == 0)
+        if (maxit == max_it_local)
             std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }
 
@@ -90,35 +92,47 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
 }
 
 SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
-                   SRWVector& x, double epsilon, int maxit){
+                   SRWVector& x, double epsilon, int &maxit){
+
+    double max_it_local = maxit;
+    maxit = 0;
     double tau = 1;
     SRWMatrix& iP = P.iP();
 
-    SRWVector& r = (f - A*x);
+    int n = sqrt(iP.rows());
+    int k = 0;
 
     SRWVector& tmp_v = *(new Eigen3Vector(P.Dx().cols()));
+    SRWVector& tmp_solve = *(new Eigen3Vector(P.Dx().cols()));
     SRWVector& corr = *(new Eigen3Vector(P.Dy().cols()));
+    SRWVector *r, *Aw;
 
-    tmp_v = TDMA(P.Dx(), tmp_v, r);
-    corr = TDMA(P.Dy(), corr, tmp_v);
+    while(maxit++ < max_it_local){
 
-    SRWVector& Aw = A*corr;
+        r = &(f - A*x);
 
-    while(maxit-- > 0){
+        tmp_v.resize(0);
 
-        tau = Aw.dot(corr) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
+        for (int i = 0; i<n; i++){
+            k = (i*n);
+            tmp_v = tmp_v.glue(tmp_v, TDMA(P.Dx().subMatrix(k,k,n,n), tmp_solve, r->segment(k, n)));
+        }
+
+        corr.resize(0);
+
+        for (int i = 0; i<n; i++){
+            k = (i*n);
+            corr = corr.glue(corr, TDMA(P.Dy().subMatrix(k,k,n,n), tmp_solve, tmp_v.segment(k, n)));
+        }
+
+        Aw = &(A*corr);
+
+        tau = Aw->dot(corr) / static_cast<SRWVector&>(iP**Aw).dot(*Aw);
 
         x = x + corr*tau;
 
-        r = (f - A*x);
-
-        tmp_v = TDMA(P.Dx(), tmp_v, r);
-        corr = TDMA(P.Dy(), corr, tmp_v);
-
-        Aw = A*corr;
-
-        if (r.norm("m") < epsilon) break;
-        if (maxit == 0)
+        if (r->norm("m") < epsilon) break;
+        if (maxit == max_it_local)
             std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }
 

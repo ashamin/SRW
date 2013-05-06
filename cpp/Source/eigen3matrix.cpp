@@ -57,6 +57,14 @@ SRWMatrix& Eigen3Matrix::split(SRWVector& v, int length, bool byrow){
     return ret_m;
 }
 
+SRWMatrix& Eigen3Matrix::subMatrix(int upperleft_corner_row, int upperleft_corner_col, int rows, int cols){
+    SRWMatrix& sub_mtx = *(new Eigen3Matrix(rows, cols));
+    for (int i = 0; i<rows; i++)
+        for (int j = 0; j<cols; j++)
+            sub_mtx(i, j) = this->matrix(i+upperleft_corner_row, j+upperleft_corner_col);
+    return sub_mtx;
+}
+
 double Eigen3Matrix::norm(std::string n_type){
     if (n_type == "f" || n_type == "F"){
         return this->matrix.norm();

@@ -97,11 +97,14 @@ int main(int argc, char *argv[])
     int I = 10, J = 10;
     Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN1);
 
-    SRWMatrix& sl = solve_poiss_2D_square(test, I, J);
+    int itnum = 400;
+
+    SRWMatrix& sl = solve_poiss_2D_square(test, I, J, itnum);
 
     SRWMatrix& ra = test.get_right_answer_as_matrix(I, J);
 
-    cout << (ra - sl).norm("F")/sl.norm("F") << endl << endl;
+    cout << "Frobenius norm of error" << "\t\t" << "iteration number" << endl;
+    cout << (ra - sl).norm("F")/sl.norm("F") << "\t\t\t" << itnum << endl << endl;
 
 
     /*par2DPreconditioner& p = *(new par2DPreconditioner(.8, 9, .11, "par.SSOR"));

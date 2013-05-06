@@ -99,8 +99,6 @@ mincorr.par.seq <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=20
     
     r <- (f - A%*%x0)    
     
-    tmp = TDMA.m(P$Mx, r)
-    
     tmp = double(0)
     
     for (i in 1:n){

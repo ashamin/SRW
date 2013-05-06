@@ -28,6 +28,7 @@ public:
     virtual bool setDiag(int diagnum, SRWVector& v);
 
     virtual SRWMatrix& split(SRWVector& v, int length, bool byrow);
+    virtual SRWMatrix& subMatrix(int upperleft_corner_row, int upperleft_corner_col, int rows, int cols);
 
     virtual double norm(std::string n_type);
 

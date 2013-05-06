@@ -50,7 +50,7 @@ SRWVector& form_b_vector(Test2DPoissonSquareArea& test, int n,
 }
 
 SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
-                                 int I, int J){
+                                 int I, int J, int &maxit){
     double h1 = test.a / (I-1), h2 = test.b / (J-1);
     SRWVector& x = *(new Eigen3Vector(I));
     SRWVector& y = *(new Eigen3Vector(J));
@@ -70,16 +70,15 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
 
     /*solve = MINCORR(A, b,
                     *(new Preconditioner(Preconditioners::SSOR_precond(A, 1))),
-                    solve, 1e-5, 400);*/
+                    solve, 1e-5, maxit);*/
 
     /*solve = MINCORR(A, b,
                     *(new Preconditioner(A, 1, "SSOR")),
-                    solve, 1e-5, 400);*/
+                    solve, 1e-5, maxit);*/
 
     solve = seq_par_MINCORR(A, b,
                     *(new par2DPreconditioner(.5, n, h1, "par.SSOR")),
-                    solve, 1e-5, 400);
-
+                    solve, 1e-5, maxit);
 
     A = A.split(solve, I-2, false);
 
