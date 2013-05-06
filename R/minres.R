@@ -79,8 +79,8 @@ mincorr <- function(A, f, P=Jacobi.precond(A), x0=rnorm(length(f)), epsilon=1e-5
 
 
 
-# Parallel experimental version of MINRES method
-mincorr.par <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
+# Parallel sequent experimental version of MINRES method
+mincorr.par.seq <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
   
   #################################
   #   taus = numeric(0)
@@ -91,6 +91,8 @@ mincorr.par <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
   step.residual <- double(0)
   
   iP = solve(P$Mx %*% P$My)
+  
+  n = sqrt(length(iP[1,]))
 
   repeat{
     it <-it - 1
@@ -98,7 +100,22 @@ mincorr.par <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
     r <- (f - A%*%x0)    
     
     tmp = TDMA.m(P$Mx, r)
-    corr = TDMA.m(P$My, tmp)
+    
+    tmp = double(0)
+    
+    for (i in 1:n){
+      k = ((i-1)*n + 1)
+      p = ((i-1)*n + n)
+      tmp = c(tmp, TDMA.m(P$Mx[k:p, k:p], r[k:p]))
+    }
+    
+    corr = double(0)
+    
+    for (i in 1:n){
+      k = ((i-1)*n + 1)
+      p = ((i-1)*n + n)
+      corr = c(corr, TDMA.m(P$My[k:p, k:p], tmp[k:p]))
+    }
     
     Aw = A%*%corr
     
@@ -117,6 +134,69 @@ mincorr.par <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
     
     if (max(abs(f - A%*%x)) < epsilon) break 
 #     if (it == 0) stop("Iteration process obviously won't converge. \n Try to increase \"maxit\" value")
+    if (it == 0) break;
+  }
+  ###############################
+  #   View(taus)
+  return (list(root=x, residual=f - A%*%x, it=maxit-it, step.residual=step.residual))
+}
+
+
+# Parallel sequent experimental version of MINRES method
+mincorr.par <- function(A, f, P, x0=rnorm(length(f)), epsilon=1e-5, maxit=200){
+  
+  #################################
+  #   taus = numeric(0)
+  
+  tau = 1
+  
+  it <- maxit
+  step.residual <- double(0)
+  
+  iP = solve(P$Mx %*% P$My)
+  
+  n = sqrt(length(iP[1,]))
+  
+  repeat{
+    it <-it - 1
+    
+    r <- (f - A%*%x0)    
+    
+    tmp = TDMA.m(P$Mx, r)
+    
+    tmp = double(0)
+    
+    for (i in 1:n){
+      k = ((i-1)*n + 1)
+      p = ((i-1)*n + n)
+      tmp = c(tmp, TDMA.m(P$Mx[k:p, k:p], r[k:p]))
+    }
+    
+    corr = double(0)
+    
+    for (i in 1:n){
+      k = ((i-1)*n + 1)
+      p = ((i-1)*n + n)
+      corr = c(corr, TDMA.m(P$My[k:p, k:p], tmp[k:p]))
+    }
+    
+    Aw = A%*%corr
+    
+    tau <- as.double(crossprod(Aw, corr)/crossprod(iP%*%Aw, Aw))
+    #tau = .95
+    step.residual <- c(step.residual, norm(r))
+    
+    #############################
+    #     taus = c(taus, tau)
+    
+    x <- x0 + tau*corr
+    x0 <- x
+    
+    #print(max(abs(f - A%*%x)))
+    #print(tau)
+    
+    if (max(abs(f - A%*%x)) < epsilon) break 
+    #     if (it == 0) stop("Iteration process obviously won't converge. \n Try to increase \"maxit\" value")
     if (it == 0) break;
   }
   ###############################
