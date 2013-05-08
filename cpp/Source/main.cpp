@@ -18,99 +18,105 @@
 #include "Headers/Preconditioning/preconditioner.h"
 #include "Headers/Preconditioning/par2DPreconditioner.h"
 
+
+#include <fstream>
+#include <iostream>
+#include "time.h"
+
 //using namespace Eigen;
 using namespace std;
+
+
+void print_perf_measurement(int I, double norm, int itnum, double time){
+    fstream out;
+    out.open("test3_perf.csv", ios::in | ios::out);
+
+
+    string str;
+
+    out.seekg(0, ios::beg);
+    while (out >> str){}
+
+    out.clear();
+    out.seekp(0, ios::end);
+
+    out << I << "," << norm << "," << itnum << "," << time << endl;
+
+    out.close();
+}
+
+void measure_poiss(int parts){
+    int I , J;
+    clock_t ctime;
+    I = J = parts;
+    Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN3);
+
+    int itnum = 5000;
+
+
+    ctime = clock();
+    SRWMatrix& sl = solve_poiss_2D_square(test, I, J, itnum);
+    ctime = clock() - ctime;
+
+    SRWMatrix& ra = test.get_right_answer_as_matrix(I, J);
+
+    double time = (double)ctime/CLOCKS_PER_SEC;
+
+    print_perf_measurement(I, (ra - sl).norm("F")/sl.norm("F"), itnum, time);
+
+
+    /*cout << "Frobenius norm of error" << "\t\t" << "iteration number" << endl;*/
+    cout << time<< endl;
+    cout << I << "\t\t\t" <<  (ra - sl).norm("F")/sl.norm("F") << "\t\t\t" << itnum << endl << endl;
+
+}
+
+#include "omp.h"
+#define N 100000
 
 int main(int argc, char *argv[])
 {
 
-    /*MatrixXd m1 = MatrixXd::Random(5, 5);
-    VectorXd v1 = VectorXd::Random(5);
-
-    double x = m1(1, 1);
-
-    VectorXd v2 = m1.ldlt().solve(v1);*/
-
-    /*MatrixXd m2(2,2);
-
-    m1(1, 1) = 1.8767;
-    m2(1, 1) = 2.2384763;
-
-    m1 =  m1*m2;*/
-
-
-   /*SRWMatrix& m = *(new Eigen3Matrix(5, 5));
-
-    SRWVector& v = m.diag(-1);
-
-    v = *(new Eigen3Vector(5));
-
-    bool olol = m.setDiag(0, v);
-
-    if (olol) cout << "OK" << endl;
-
-    cout << dynamic_cast<Eigen3Matrix&>(m).getMatrix() << endl << endl
-         << dynamic_cast<Eigen3Vector&>(v).getVector() << endl << endl;
-
-    m = m.transpose();
-
-    cout << dynamic_cast<Eigen3Matrix&>(m).getMatrix() << endl << endl;
-
-    SRWMatrix& im = m.inverse();
-
-    cout << dynamic_cast<Eigen3Matrix&>(im * m).getMatrix() << endl << endl;*/
-
-    /*int n = 1000;
-
-    SRWVector& x = *(new Eigen3Vector(n));
-    SRWMatrix& A = *(new Eigen3Matrix(n, n));
-    for (int i = 0; i<n; i++)
-        for (int j = 0; j<n; j++)
-            A(i, j) = 0;
-    SRWVector& b = *(new Eigen3Vector(n));
-
-    A.setDiag(0, *(new Eigen3Vector(n)));
-    A.setDiag(1, *(new Eigen3Vector(n)));
-    A.setDiag(-1, *(new Eigen3Vector(n)));
-
-
-
-    x = TDMA(A, x, b);
-
-    (A*x-b).print();*/
-
-    /*SRWMatrix& m = form_A_matrix(4, .5, .5, 4);
-    m.print();
-    m = form_A_matrix(16, .5, .5, 6);
-    m.print();*/
-
-    //solve_poiss_2D_square(*(new Test2DPoissonSquareAreaN1), 8, 8);
-
-
-        //////// ПЕРЕНОСИМ split в SRWVECTOR!!!!!!!!!!!!!!!!!!!
-
-    /*SRWVector& v = *(new Eigen3Vector(25));
-    SRWMatrix& m = *(new Eigen3Matrix(1, 1));
-    m = m.split(v, 5, true);
-    m.print();*/
-
-    int I = 10, J = 10;
-    Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN1);
-
-    int itnum = 400;
-
-    SRWMatrix& sl = solve_poiss_2D_square(test, I, J, itnum);
-
-    SRWMatrix& ra = test.get_right_answer_as_matrix(I, J);
-
-    cout << "Frobenius norm of error" << "\t\t" << "iteration number" << endl;
-    cout << (ra - sl).norm("F")/sl.norm("F") << "\t\t\t" << itnum << endl << endl;
-
+    //measure_poiss(20);
 
     /*par2DPreconditioner& p = *(new par2DPreconditioner(.8, 9, .11, "par.SSOR"));
 
     p.P().print();*/
 
+
+      double a[N], b[N], c[N];
+      int i;
+      omp_set_dynamic(0);      // запретить библиотеке openmp менять число потоков во время исполнения
+      omp_set_num_threads(10); // установить число потоков в 10
+
+      // инициализируем массивы
+      for (i = 0; i < N; i++)
+      {
+          a[i] = i * 1.0;
+          b[i] = i * 2.0;
+      }
+
+    //clock_t ot1 = clock();
+    double t1 = omp_get_wtime();
+
+      // вычисляем сумму массивов
+    #pragma omp parallel shared(a, b, c) private(i)
+      {
+    #pragma omp for
+        for (i = 0; i < N; i++)
+            for (int j = 0; j<1000; j++)
+          c[i] = a[i] + b[i];
+      }
+
+   // clock_t ot2 = clock();
+    double t2 = omp_get_wtime();
+
+    //cout << (double)(ot2-ot1)/CLOCKS_PER_SEC << endl << endl;
+
+    cout << t2-t1 << endl << endl;
+
+      printf ("%f\n", c[10]);
+      return 0;
 
     return 0;
 }

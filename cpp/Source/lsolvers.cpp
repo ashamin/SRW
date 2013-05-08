@@ -139,6 +139,11 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     return x;
 }
 
+SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
+                       SRWVector& x, double epsilon, int &maxit){
+    return *(new Eigen3Vector(0));
+}
+
 
 
 

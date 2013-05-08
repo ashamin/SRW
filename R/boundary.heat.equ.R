@@ -14,10 +14,9 @@
 #
 #' @author Anton Shamin
 
-init <- function(){
-  source("R/TDMA.R")
-  library("animation", lib.loc="/home/ashamin/R/lib")
-}
+source("R/TDMA.R")
+library("animation")
+
 
 # Test area
 # You may change this for solving your own heat equation by default

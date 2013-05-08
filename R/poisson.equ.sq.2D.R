@@ -122,11 +122,11 @@ slv.poisson <- function(a=a.test, b=b.test, g1=g1.test, g2=g2.test,
     
   b <- form.b(n, I, J, x, y, h1, h2, f, g1, g2, g3, g4)
   
-#   print.temperaturegrams(x, y, A, b, I, J)
+  print.temperaturegrams(x, y, A, b, I, J)
   
   #######hardcore parallel method!!!!!
-  source("R/experimental/slv.poisson.experimental.R")
-  print.temperaturegrams.par.method(x, y, A, b, I, J, n, h1);
+#   source("R/experimental/slv.poisson.experimental.R")
+#   print.temperaturegrams.par.method(x, y, A, b, I, J, n, h1);
   
 #   res = data.frame(solve = slv(A, b, P=SSOR.precond.approach1(A, .8), maxit=1000)$root, 
 #                   answer = get.res.vector(n, I, J, x, y))

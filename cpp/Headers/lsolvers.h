@@ -40,4 +40,8 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
 SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                    SRWVector& x, double epsilon, int &maxit);
 
+SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
+                       SRWVector& x, double epsilon, int &maxit);
+
+
 #endif // LSOLVERS_H
