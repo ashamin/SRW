@@ -23,6 +23,8 @@
 #include <iostream>
 #include "time.h"
 
+#include <vector>
+
 //using namespace Eigen;
 using namespace std;
 
@@ -49,7 +51,7 @@ void measure_poiss(int parts){
     int I , J;
     clock_t ctime;
     I = J = parts;
-    Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN3);
+    Test2DPoissonSquareArea& test = *(new Test2DPoissonSquareAreaN1);
 
     int itnum = 5000;
 
@@ -62,7 +64,7 @@ void measure_poiss(int parts){
 
     double time = (double)ctime/CLOCKS_PER_SEC;
 
-    print_perf_measurement(I, (ra - sl).norm("F")/sl.norm("F"), itnum, time);
+    //print_perf_measurement(I, (ra - sl).norm("F")/sl.norm("F"), itnum, time);
 
 
     /*cout << "Frobenius norm of error" << "\t\t" << "iteration number" << endl;*/
@@ -77,46 +79,8 @@ void measure_poiss(int parts){
 int main(int argc, char *argv[])
 {
 
-    //measure_poiss(20);
+    measure_poiss(10);
 
-    /*par2DPreconditioner& p = *(new par2DPreconditioner(.8, 9, .11, "par.SSOR"));
-
-    p.P().print();*/
-
-
-      double a[N], b[N], c[N];
-      int i;
-      omp_set_dynamic(0);      // запретить библиотеке openmp менять число потоков во время исполнения
-      omp_set_num_threads(10); // установить число потоков в 10
-
-      // инициализируем массивы
-      for (i = 0; i < N; i++)
-      {
-          a[i] = i * 1.0;
-          b[i] = i * 2.0;
-      }
-
-    //clock_t ot1 = clock();
-    double t1 = omp_get_wtime();
-
-      // вычисляем сумму массивов
-    #pragma omp parallel shared(a, b, c) private(i)
-      {
-    #pragma omp for
-        for (i = 0; i < N; i++)
-            for (int j = 0; j<1000; j++)
-          c[i] = a[i] + b[i];
-      }
-
-   // clock_t ot2 = clock();
-    double t2 = omp_get_wtime();
-
-    //cout << (double)(ot2-ot1)/CLOCKS_PER_SEC << endl << endl;
-
-    cout << t2-t1 << endl << endl;
-
-      printf ("%f\n", c[10]);
-      return 0;
 
     return 0;
 }

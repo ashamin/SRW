@@ -62,7 +62,7 @@ SRWVector& Eigen3Vector::operator= (SRWVector& v){
     if (this == &v)
         return *this;
     else{
-        this->vector =  dynamic_cast<Eigen3Vector&>(v).vector;
+        this->vector =  static_cast<Eigen3Vector&>(v).vector;
         return *this;
     }
 }
@@ -79,6 +79,7 @@ bool Eigen3Vector::operator ==(SRWVector& v){
 
 SRWVector& Eigen3Vector::operator+ (SRWVector& v){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
+    //Eigen3Vector ret_v(this->length());
     ret_v.vector = this->vector + dynamic_cast<Eigen3Vector&>(v).vector;
     return ret_v;
 }
@@ -139,5 +140,4 @@ SRWVector& Eigen3Vector::glue(SRWVector& v1, SRWVector& v2){
 }
 
 Eigen3Vector::~Eigen3Vector(){
-
 }

@@ -107,6 +107,9 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     SRWVector& corr = *(new Eigen3Vector(P.Dy().cols()));
     SRWVector *r, *Aw;
 
+
+    clock_t ctime;
+    ctime = clock();
     while(maxit++ < max_it_local){
 
         r = &(f - A*x);
@@ -135,13 +138,87 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
         if (maxit == max_it_local)
             std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }
+    ctime = clock() - ctime;
+    std::cout << "ORDINARY_TIME = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;
 
     return x;
 }
 
 SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                        SRWVector& x, double epsilon, int &maxit){
-    return *(new Eigen3Vector(0));
+
+    double max_it_local = maxit;
+    maxit = 0;
+    double tau = 1;
+    SRWMatrix& iP = P.iP();
+
+    int n = sqrt(iP.rows());
+    int i;
+    int k = 0;
+
+    /*SRWVector& tmp_v = *(new Eigen3Vector(P.Dx().cols()));
+    SRWVector& tmp_solve = *(new Eigen3Vector(P.Dx().cols()));*/
+
+    omp_set_dynamic(0);
+    omp_set_num_threads(10);
+
+    std::vector <SRWVector*> tmp_v;
+    for (int i = 0; i<n; i++)
+        tmp_v.push_back(new Eigen3Vector(0));
+
+    std::vector <SRWVector*> tmp_solve;
+    for (int i = 0; i<n; i++)
+        tmp_solve.push_back(new Eigen3Vector(0));
+
+    std::vector <SRWVector*> tmp_corr;
+    for (int i = 0; i<n; i++)
+        tmp_corr.push_back(new Eigen3Vector(0));
+
+    SRWVector& corr = *(new Eigen3Vector(P.Dy().cols()));
+    SRWVector *r, *Aw;
+
+
+    double time = omp_get_wtime();
+    while(maxit++ < max_it_local){
+
+        r = &(f - A*x);
+
+
+        #pragma omp parallel for shared(P, r, tmp_v, tmp_solve) \
+                                    firstprivate(n) private(i, k) \
+                                    schedule(static)
+        for (i = 0; i<n; i++){
+            k = (i*n);
+            *tmp_v.at(i) = TDMA(P.Dx().subMatrix(k,k,n,n), *tmp_solve.at(i), r->segment(k, n));
+        }
+
+        #pragma omp parallel for shared(P, tmp_v, tmp_corr, tmp_solve) \
+                                    firstprivate(n) private(i, k) \
+                                    schedule(static)
+        for (i = 0; i<n; i++){
+            k = (i*n);
+            *tmp_corr.at(i) = TDMA(P.Dy().subMatrix(k,k,n,n), *tmp_solve.at(i), *tmp_v.at(i));
+        }
+
+        corr.resize(0);
+        for (int i = 0; i<n; i++)
+            corr = corr.glue(corr, *tmp_corr.at(i));
+
+
+        Aw = &(A*corr);
+
+        tau = Aw->dot(corr) / static_cast<SRWVector&>(iP**Aw).dot(*Aw);
+
+        x = x + corr*tau;
+
+        if (r->norm("m") < epsilon) break;
+        if (maxit == max_it_local)
+            std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
+    }
+    time = time - omp_get_wtime();
+    std::cout << "OMP_TIME = " << time << std::endl<< std::endl;
+
+    return x;
 }
 
 

@@ -15,6 +15,7 @@ class Eigen3Matrix : public SRWMatrix
 {
 public:
     Eigen3Matrix(int rows, int columns);
+    ~Eigen3Matrix();
 
     virtual int rows();
     virtual int cols();

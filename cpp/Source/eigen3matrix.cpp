@@ -163,3 +163,6 @@ SRWMatrix& Eigen3Matrix::operator /(double c){
 double& Eigen3Matrix::operator ()(int row, int column){
     return this->matrix(row, column);
 }
+
+Eigen3Matrix::~Eigen3Matrix(){
+}

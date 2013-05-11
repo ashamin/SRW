@@ -72,13 +72,17 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
                     *(new Preconditioner(Preconditioners::SSOR_precond(A, 1))),
                     solve, 1e-5, maxit);*/
 
-    solve = MINCORR(A, b,
+    /*solve = MINCORR(A, b,
                     *(new Preconditioner(A, 1, "SSOR")),
-                    solve, 1e-5, maxit);
+                    solve, 1e-5, maxit);*/
 
     /*solve = seq_par_MINCORR(A, b,
-                    *(new par2DPreconditioner(.5, n, h1, "par.SSOR")),
+                    *(new par2DPreconditioner(.6, n, h1, "par.SSOR")),
                     solve, 1e-5, maxit);*/
+
+    solve = MINCORR_omp(A, b,
+                    *(new par2DPreconditioner(.6, n, h1, "par.SSOR")),
+                    solve, 1e-5, maxit);
 
     A = A.split(solve, I-2, false);
 

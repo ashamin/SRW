@@ -13,6 +13,10 @@
 #include "Headers/Preconditioning/preconditioner.h"
 #include "Headers/Preconditioning/par2DPreconditioner.h"
 
+#include <vector>
+
+#include "omp.h"
+
 /**
  * @brief TDMA_d
  *          Tridiagonal Matrix Algorithm
