@@ -38,7 +38,7 @@ SRWVector& Eigen3Matrix::diag(int diagnum){
 
 bool Eigen3Matrix::setDiag(int diagnum, SRWVector &v){
     if (this->diag(diagnum).length() == v.length()){
-        this->matrix.diagonal(diagnum) = dynamic_cast<Eigen3Vector&>(v).vector;
+        this->matrix.diagonal(diagnum) = static_cast<Eigen3Vector&>(v).vector;
         return true;
     }
     return false;
@@ -115,36 +115,36 @@ SRWMatrix& Eigen3Matrix::operator =(SRWMatrix& m){
         return *this;
     }
     else{
-        this->matrix = dynamic_cast<Eigen3Matrix&>(m).matrix;
+        this->matrix = static_cast<Eigen3Matrix&>(m).matrix;
         return *this;
     }
 }
 
 bool Eigen3Matrix::operator ==(SRWMatrix& m){
-    return this->matrix == dynamic_cast<Eigen3Matrix&>(m).matrix;
+    return this->matrix == static_cast<Eigen3Matrix&>(m).matrix;
 }
 
 SRWMatrix& Eigen3Matrix::operator *(SRWMatrix& m){
     Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
-    ret_m.matrix = this->matrix * dynamic_cast<Eigen3Matrix&>(m).matrix;
+    ret_m.matrix = this->matrix * static_cast<Eigen3Matrix&>(m).matrix;
     return ret_m;
 }
 
 SRWVector& Eigen3Matrix::operator *(SRWVector& v){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->rows()));
-    ret_v.vector = this->matrix * dynamic_cast<Eigen3Vector&>(v).vector;
+    ret_v.vector = this->matrix * static_cast<Eigen3Vector&>(v).vector;
     return ret_v;
 }
 
 SRWMatrix& Eigen3Matrix::operator +(SRWMatrix& m){
     Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
-    ret_m.matrix = this->matrix + dynamic_cast<Eigen3Matrix&>(m).matrix;
+    ret_m.matrix = this->matrix + static_cast<Eigen3Matrix&>(m).matrix;
     return ret_m;
 }
 
 SRWMatrix& Eigen3Matrix::operator -(SRWMatrix& m){
     Eigen3Matrix& ret_m= *(new Eigen3Matrix(this->rows(), m.cols()));
-    ret_m.matrix = this->matrix - dynamic_cast<Eigen3Matrix&>(m).matrix;
+    ret_m.matrix = this->matrix - static_cast<Eigen3Matrix&>(m).matrix;
     return ret_m;
 }
 

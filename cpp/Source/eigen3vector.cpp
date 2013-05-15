@@ -30,7 +30,7 @@ SRWVector& Eigen3Vector::segment(int index, int length){
 }
 
 double Eigen3Vector::dot(SRWVector& v){
-    return this->vector.dot(dynamic_cast<Eigen3Vector&>(v).vector);
+    return this->vector.dot(static_cast<Eigen3Vector&>(v).vector);
 }
 
 double Eigen3Vector::norm(std::string n_type){
@@ -68,25 +68,25 @@ SRWVector& Eigen3Vector::operator= (SRWVector& v){
 }
 
 bool Eigen3Vector::operator ==(SRWVector& v){
-    return this->vector == dynamic_cast<Eigen3Vector&>(v).vector;
+    return this->vector == static_cast<Eigen3Vector&>(v).vector;
 }
 
 /*SRWVector& Eigen3Vector::operator* (SRWVector& v){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
-    ret_v.vector = this->vector * dynamic_cast<Eigen3Vector&>(v).vector;
+    ret_v.vector = this->vector * static_cast<Eigen3Vector&>(v).vector;
     return ret_v;
 }*/
 
 SRWVector& Eigen3Vector::operator+ (SRWVector& v){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
     //Eigen3Vector ret_v(this->length());
-    ret_v.vector = this->vector + dynamic_cast<Eigen3Vector&>(v).vector;
+    ret_v.vector = this->vector + static_cast<Eigen3Vector&>(v).vector;
     return ret_v;
 }
 
 SRWVector& Eigen3Vector::operator- (SRWVector& v){
     Eigen3Vector& ret_v = *(new Eigen3Vector(this->length()));
-    ret_v.vector = this->vector - dynamic_cast<Eigen3Vector&>(v).vector;
+    ret_v.vector = this->vector - static_cast<Eigen3Vector&>(v).vector;
     return ret_v;
 }
 
