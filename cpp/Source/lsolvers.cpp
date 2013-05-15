@@ -73,6 +73,8 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
     SRWVector& w = iP*r;
     SRWVector& Aw = A*w;
 
+    clock_t ctime;
+    ctime = clock();
     while(maxit++ < max_it_local){
 
         tau = Aw.dot(w) / static_cast<SRWVector&>(iP*Aw).dot(Aw);
@@ -87,6 +89,8 @@ SRWVector& MINCORR(SRWMatrix& A, SRWVector& f, Preconditioner& P,
         if (maxit == max_it_local)
             std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }
+    ctime = clock() - ctime;
+    std::cout << "ITERATIVE_SSOR = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;
 
     return x;
 }
@@ -139,7 +143,7 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
             std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }
     ctime = clock() - ctime;
-    std::cout << "ORDINARY_TIME = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;
+    std::cout << "SEQUENT_PAR_SSOR = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;
 
     return x;
 }
@@ -162,6 +166,9 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     omp_set_dynamic(0);
     omp_set_num_threads(10);
 
+
+
+    // here we allocate memory for all objects to decrease memory accessing
     std::vector <SRWVector*> tmp_v;
     for (int i = 0; i<n; i++)
         tmp_v.push_back(new Eigen3Vector(0));
@@ -174,6 +181,24 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     for (int i = 0; i<n; i++)
         tmp_corr.push_back(new Eigen3Vector(0));
 
+    std::vector <SRWMatrix*> sub_mtrs_Dx;
+    for (int i = 0; i<n; i++){
+        k = (i*n);
+        sub_mtrs_Dx.push_back(&P.Dx().subMatrix(k,k,n,n));
+    }
+
+    std::vector <SRWMatrix*> sub_mtrs_Dy;
+    for (int i = 0; i<n; i++){
+        k = (i*n);
+        sub_mtrs_Dy.push_back(&P.Dy().subMatrix(k,k,n,n));
+    }
+
+    /*std::vector <SRWVector*> seg_r;
+    for (inr i = 0; i<n; i++)
+        seg_r.push_back(new Eigen3Vector(0));*/
+
+
+
     SRWVector& corr = *(new Eigen3Vector(P.Dy().cols()));
     SRWVector *r, *Aw;
 
@@ -184,20 +209,20 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
         r = &(f - A*x);
 
 
-        #pragma omp parallel for shared(P, r, tmp_v, tmp_solve) \
+        #pragma omp parallel for shared(sub_mtrs_Dx, r, tmp_v, tmp_solve) \
                                     firstprivate(n) private(i, k) \
                                     schedule(static)
         for (i = 0; i<n; i++){
             k = (i*n);
-            *tmp_v.at(i) = TDMA(P.Dx().subMatrix(k,k,n,n), *tmp_solve.at(i), r->segment(k, n));
+            *tmp_v.at(i) = TDMA(*sub_mtrs_Dx.at(i), *tmp_solve.at(i), r->segment(k, n));
         }
 
-        #pragma omp parallel for shared(P, tmp_v, tmp_corr, tmp_solve) \
+        #pragma omp parallel for shared(sub_mtrs_Dy, tmp_v, tmp_corr, tmp_solve) \
                                     firstprivate(n) private(i, k) \
                                     schedule(static)
         for (i = 0; i<n; i++){
             k = (i*n);
-            *tmp_corr.at(i) = TDMA(P.Dy().subMatrix(k,k,n,n), *tmp_solve.at(i), *tmp_v.at(i));
+            *tmp_corr.at(i) = TDMA(*sub_mtrs_Dy.at(i), *tmp_solve.at(i), *tmp_v.at(i));
         }
 
         corr.resize(0);
@@ -215,7 +240,7 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
         if (maxit == max_it_local)
             std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }
-    time = time - omp_get_wtime();
+    time = omp_get_wtime() - time;
     std::cout << "OMP_TIME = " << time << std::endl<< std::endl;
 
     return x;

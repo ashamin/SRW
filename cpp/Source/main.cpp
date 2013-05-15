@@ -79,7 +79,14 @@ void measure_poiss(int parts){
 int main(int argc, char *argv[])
 {
 
-    measure_poiss(10);
+    measure_poiss(30);
+
+    /*SRWVector& v = Eigen3Vector(5);
+    v.print();*/
+
+    /*VectorXd a(10);
+
+    a = a.transpose();*/
 
 
     return 0;
