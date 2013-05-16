@@ -21,33 +21,29 @@
 SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
                   SRWVector& c, SRWVector& d, SRWVector& x){
 
-    SRWVector& r_part = *(new Eigen3Vector(d.length()));
-    r_part = d;
     int n = d.length();
     x.resize(n);
+    double local_d[n];
     double tmp = 0;
 
     c(0) = c(0)/b(0);
-    d(0) = d(0)/b(0);
+    local_d[0] = d(0)/b(0);
 
     for (int i = 1; i<(n-1); i++){
         tmp = b(i) - c(i-1)*a(i-1);
         c(i) = c(i) / tmp;
-        d(i) = (d(i) - d(i-1)*a(i-1)) / tmp;
+        local_d[i] = (d(i) - local_d[i-1]*a(i-1)) / tmp;
     }
 
-    d(n-1) = (d(n-1) - d(n-2)*a(n-2)) / (b(n-1) - c(n-2)*a(n-2));
+    local_d[n-1] = (d(n-1) - local_d[n-2]*a(n-2)) / (b(n-1) - c(n-2)*a(n-2));
 
-    x(n-1) = d(n-1);
+    x(n-1) = local_d[n-1];
     for (int i = n-2; i>=0; i--)
-        x(i) = d(i) - c(i)*x(i+1);
-
-    d = r_part;
-
-    delete &r_part;
+        x(i) = local_d[i] - c(i)*x(i+1);
 
     return x;
 }
+
 
 SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b){
     return TDMA_d(A.diag(-1), A.diag(0), A.diag(1), b, x);
@@ -157,7 +153,6 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
 
     omp_set_dynamic(0);
     omp_set_num_threads(10);
-
 
 
     // here we allocate memory for all objects to decrease memory accessing
