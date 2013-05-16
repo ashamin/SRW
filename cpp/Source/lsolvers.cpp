@@ -1,10 +1,31 @@
 
 #include "Headers/lsolvers.h"
 
+/**
+ * @brief dvacm
+ *          Direct vector addition with vector constant multiplication
+ *              dest = dest + source*double_const;
+ * @param dest
+ * @param source
+ * @param c
+ */
+void dvacm(SRWVector& dest, SRWVector& source, double c){
+    int n = dest.length();
+    //if (!(n - source.length())){
+        for (int i = 0; i< n; i++)
+            dest(i) += source(i)*c;
+    //}
+}
+
+void dvsmvm(){
+
+}
+
 
 /**
  * @brief TDMA_d
  *          Tridiagonal Matrix Algorithm
+ *              you should know x.length() before call
  * @param a
  *          lower diagonal
  * @param b
@@ -22,7 +43,7 @@ SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
                   SRWVector& c, SRWVector& d, SRWVector& x){
 
     int n = d.length();
-    x.resize(n);
+    //x.resize(n);
     double local_d[n];
     double tmp = 0;
 
@@ -144,7 +165,12 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     double tau = 1;
     SRWMatrix& iP = P.iP();
 
-    int n = sqrt(iP.rows());
+    int m = iP.rows();
+
+    int n = sqrt(m);
+
+    m /= n;
+
     int i;
     int k = 0;
 
@@ -158,15 +184,15 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     // here we allocate memory for all objects to decrease memory accessing
     std::vector <SRWVector*> tmp_v;
     for (int i = 0; i<n; i++)
-        tmp_v.push_back(new Eigen3Vector(0));
+        tmp_v.push_back(new Eigen3Vector(m));
 
     std::vector <SRWVector*> tmp_solve;
     for (int i = 0; i<n; i++)
-        tmp_solve.push_back(new Eigen3Vector(0));
+        tmp_solve.push_back(new Eigen3Vector(m));
 
     std::vector <SRWVector*> tmp_corr;
     for (int i = 0; i<n; i++)
-        tmp_corr.push_back(new Eigen3Vector(0));
+        tmp_corr.push_back(new Eigen3Vector(m));
 
     std::vector <SRWMatrix*> sub_mtrs_Dx;
     for (int i = 0; i<n; i++){
@@ -201,7 +227,8 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                                     schedule(static)
         for (i = 0; i<n; i++){
             k = (i*n);
-            *tmp_v.at(i) = TDMA(*sub_mtrs_Dx.at(i), *tmp_solve.at(i), r->segment(k, n));
+            //TDMA(*sub_mtrs_Dx.at(i), *tmp_v.at(i), r->segment(k, n));
+            TDMA(*sub_mtrs_Dx[i], *tmp_v[i], r->segment(k, n));
         }
 
         #pragma omp parallel for shared(sub_mtrs_Dy, tmp_v, tmp_corr, tmp_solve) \
@@ -209,7 +236,8 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                                     schedule(static)
         for (i = 0; i<n; i++){
             k = (i*n);
-            *tmp_corr.at(i) = TDMA(*sub_mtrs_Dy.at(i), *tmp_solve.at(i), *tmp_v.at(i));
+            //TDMA(*sub_mtrs_Dy.at(i), *tmp_corr.at(i), *tmp_v.at(i));
+            TDMA(*sub_mtrs_Dy[i], *tmp_corr[i], *tmp_v[i]);
         }
 
         corr.resize(0);
@@ -221,7 +249,8 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
 
         tau = Aw->dot(corr) / static_cast<SRWVector&>(iP**Aw).dot(*Aw);
 
-        x = x + corr*tau;
+        //x = x + corr*tau;
+        dvacm(x, corr, tau);
 
         if (r->norm("m") < epsilon) break;
         if (maxit == max_it_local)
