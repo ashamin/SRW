@@ -65,6 +65,30 @@ SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
     return x;
 }
 
+void TDMA_opt(const double *a, const double *b, const double *c,
+              const double *d, double *x, int n){
+    double loc_c[n];
+    double loc_d[n];
+    double tmp = 0;
+    int i = 0;
+
+    loc_c[0] = c[0] / b[0];
+    loc_d[0] = d[0] / b[0];
+
+    for (i = 1; i<(n-1); i++){
+        tmp = b[0] - loc_c[i-1]*a[i-1];
+        loc_c[i] = c[i] / tmp;
+        loc_d[i] = (d[i] - loc_d[i-1]*a[i-1]) / tmp;
+    }
+
+    loc_d[n-1] = (d[n-1] - loc_d[n-2]*a[n-2]) / (b[n-1] - loc_c[n-2]*a[n-2]);
+
+    x[n-1] = loc_d[n-1];
+    for (i = n-2; i>=0; i--)
+        x[i] = loc_d[i] - loc_c[i]*x[i+1];
+
+    return;
+}
 
 SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b){
     return TDMA_d(A.diag(-1), A.diag(0), A.diag(1), b, x);
@@ -157,7 +181,7 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     return x;
 }
 
-SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
+SRWVector& MINCORR_omp_slow(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                        SRWVector& x, double epsilon, int &maxit){
 
     double max_it_local = maxit;
@@ -173,13 +197,6 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
 
     int i;
     int k = 0;
-
-    /*SRWVector& tmp_v = *(new Eigen3Vector(P.Dx().cols()));
-    SRWVector& tmp_solve = *(new Eigen3Vector(P.Dx().cols()));*/
-
-    omp_set_dynamic(0);
-    omp_set_num_threads(10);
-
 
     // here we allocate memory for all objects to decrease memory accessing
     std::vector <SRWVector*> tmp_v;
@@ -205,12 +222,6 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
         k = (i*n);
         sub_mtrs_Dy.push_back(&P.Dy().subMatrix(k,k,n,n));
     }
-
-    /*std::vector <SRWVector*> seg_r;
-    for (inr i = 0; i<n; i++)
-        seg_r.push_back(new Eigen3Vector(0));*/
-
-
 
     SRWVector& corr = *(new Eigen3Vector(P.Dy().cols()));
     SRWVector *r, *Aw;
@@ -260,6 +271,34 @@ SRWVector& MINCORR_omp(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     std::cout << "OMP_TIME = " << time << std::endl<< std::endl;
 
     return x;
+}
+
+
+
+void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
+                       double* f, double* x, SRWMatrix& iP, double* r,
+                       double* dx_d, double* dx_l, double* dx_u,
+                       double* dy_d, double* dy_l, double* dy_u,
+                       double epsilon, int& maxit){
+
+    double max_it_local = maxit;
+    maxit = 0;
+    double tau = 1;
+
+    // matrix always is square so we can split this way
+    int m = sqrt(iP.rows());
+    int n = m, i, k = 0;
+
+    while(maxit++ < max_it_local){
+
+        //r = &(f - A*x);
+
+
+    //many things to add
+
+    }
+
+    return;
 }
 
 

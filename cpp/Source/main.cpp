@@ -79,6 +79,18 @@ void measure_poiss(int parts){
 int main(int argc, char *argv[])
 {
 
+    /*double b[5] = {10, 10, 10, 10, 10};
+    double c[4] = {3, 1, 2, 2};
+    double a[4] = {1, 2, 3, 4};
+    double d[5] = {5, 8, 1, 9, 60};
+    double x[5] = {0, 0, 0, 0, 0};
+
+    TDMA_opt(a, b, c, d, x, 5);
+
+    for (int i = 0; i<5; i++)
+        cout << x[i] << endl;*/
+
+
     measure_poiss(10);
 
     /*SRWVector& v = Eigen3Vector(5);
