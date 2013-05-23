@@ -284,7 +284,7 @@ inline double maxd(double& v1, double& v2, double& tmp){
 
 // BEFORE CALLING THIS METHOD FILL NULLS IN DX_... and DY_... WHERE
 void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
-                       double* f, double* x, SRWMatrix& iP, double* r,
+                       double* f, double* x, double** iP, double* r,
                        double* corr, double* tmp_v, double* Aw,
                        double* dx_d, double* dx_l, double* dx_u,
                        double* dy_d, double* dy_l, double* dy_u,
@@ -302,7 +302,7 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
     // matrix always is square so we can split this way
     int m = iP.rows();
-    int n = sqrt(m), i, k = 0;
+    int n = sqrt(m), i, j, k = 0;
 
     while(maxit++ < max_it_local){
 
@@ -375,10 +375,14 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         dp_Aw_corr += Aw[k]*corr[k];
 
 
-    //computing dot product (iP*Aw; Aw) . maybe in same time than (Aw, corr) dot product
+    //computing dot product (iP*Aw; Aw) . maybe in same time with (Aw, corr) dot product
 
-
-        //here U must compute dot product!!!
+        dp_iPmAw_Aw = 0;
+        for (i = 0; i<m; i++){
+            for (j = 0; j<m; j++)
+                tmp += iP[i][j]*Aw[j];
+            dp_iPmAw_Aw += tmp*Aw[i];
+        }
 
 
     //computing tau

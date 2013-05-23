@@ -80,49 +80,43 @@ void measure_poiss(int parts){
 int main(int argc, char *argv[])
 {
 
-    /*double* x = new double[10];
+    int m = 5;
 
-    for (int i = 0; i<10; i++)
-        x[i] = i;
-
-    for (int i = 0; i<5; i++){
-        cout << (&x[0])[i] << " "  << (&x[5])[i] << endl;
-    }*/
-
-
-    /*int m = 9, n = 3;
-    int k = 0, i = 0;
-    double* dx_l = new double[m-1];
-    double* dx_d = new double[m];
-    double* dx_u = new double[m-1];
-    double* r = new double[m];
-    double* x1= new double[m];
-    double* x = new double[m];
-
-    for (int i = 0; i<(m-1); i++)
-        dx_l[i] = dx_u[i] = i;
-    dx_l[2] = dx_u[2] = 0;
-    dx_l[5] = dx_u[5] = 0;
+    MatrixXd a(m, m);
+    VectorXd b(m);
     for (int i = 0; i<m; i++){
-        dx_d[i] = 20;
-        r[i] = 7*(m-i+2);
+        b(i) = i;
+        for (int j = 0; j<m; j++)
+            a(i, j) = i+j;
     }
 
-    TDMA_opt(dx_l, dx_d, dx_u, x1, r, m);
+    cout << a*b << endl << endl;
 
-    #pragma omp parallel for shared(dx_d, dx_l, dx_u, r, x) \
-                                firstprivate(n) private(i, k) \
-                                schedule(static)
-    for (i = 0; i<n; i++){
-        k = i*n;
-        TDMA_opt(&dx_l[k], &dx_d[k], &dx_u[k], &x[k], &r[k], n);
+
+
+    double** iP = new double*[m];
+    for (int i = 0; i<m; i++)
+        iP[i] = new double[m];
+
+    double* x = new double[m];
+
+    for (int i = 0; i<m; i++){
+        x[i] = i;
+        for (int j = 0; j<m; j++)
+            iP[i][j] = i+j;
+    }
+
+    double* tmp = new double[m];
+
+    for (int i = 0; i<m; i++){
+        for (int j = 0; j<m; j++)
+            tmp[i] += iP[i][j]*x[j];
     }
 
     for (int i = 0; i<m; i++)
-        cout << x1[i] << " " << x[i] << endl;*/
+        cout << tmp[i] << endl;
 
-
-    measure_poiss(10);
+    //measure_poiss(10);
 
     /*SRWVector& v = Eigen3Vector(5);
     v.print();*/

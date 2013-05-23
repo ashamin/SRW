@@ -51,7 +51,7 @@ SRWVector& MINCORR_omp_slow(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                        SRWVector& x, double epsilon, int &maxit);
 
 void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
-                       double* f, double* x, SRWMatrix& iP, double* r,
+                       double* f, double* x, double** iP, double* r,
                        double* corr, double* tmp_v, double* Aw,
                        double* dx_d, double* dx_l, double* dx_u,
                        double* dy_d, double* dy_l, double* dy_u,

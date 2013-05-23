@@ -84,6 +84,21 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
                     *(new par2DPreconditioner(.6, n, h1, "par.SSOR")),
                     solve, 1e-5, maxit);
 
+
+
+
+    //HARDCORE CALL
+
+
+
+
+
+    //HARDCORE CALL END
+
+
+
+
+
     A = A.split(solve, I-2, false);
 
     delete &x, &y, &A, &b;
