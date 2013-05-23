@@ -37,7 +37,7 @@ SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
                   SRWVector& c, SRWVector& d, SRWVector& x);
 
 void TDMA_opt(const double* a, const double* b, const double* c,
-              const double* d, double* x, int n);
+              double* x, const double* d, int n);
 
 SRWVector& TDMA(SRWMatrix& A, SRWVector&x, SRWVector& b);
 
@@ -51,9 +51,10 @@ SRWVector& MINCORR_omp_slow(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                        SRWVector& x, double epsilon, int &maxit);
 
 void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
-                       double* f, double* x, SRWMatrix& iP,
+                       double* f, double* x, SRWMatrix& iP, double* r,
+                       double* corr, double* tmp_v, double* Aw,
                        double* dx_d, double* dx_l, double* dx_u,
                        double* dy_d, double* dy_l, double* dy_u,
-                       double epsilon, int& maxit);
+                       double epsilon, int& maxit, int ixs);
 
 #endif // LSOLVERS_H

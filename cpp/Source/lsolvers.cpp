@@ -66,7 +66,7 @@ SRWVector& TDMA_d(SRWVector& a, SRWVector& b,
 }
 
 void TDMA_opt(const double *a, const double *b, const double *c,
-              const double *d, double *x, int n){
+              double *x, const double *d, int n){
     double loc_c[n];
     double loc_d[n];
     double tmp = 0;
@@ -273,29 +273,124 @@ SRWVector& MINCORR_omp_slow(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     return x;
 }
 
+inline double maxd(double& v1, double& v2, double& tmp){
+    tmp = fabs(v2);
+    return (v1 > tmp) ? v1 : tmp;
+}
 
+// ixs = int_x_splits - means internal x splits. it's value computed by substracting
+//  2 from x_splits. so it's value that shows number of x_splits without splits
+//  near borders
 
+// BEFORE CALLING THIS METHOD FILL NULLS IN DX_... and DY_... WHERE
 void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
                        double* f, double* x, SRWMatrix& iP, double* r,
+                       double* corr, double* tmp_v, double* Aw,
                        double* dx_d, double* dx_l, double* dx_u,
                        double* dy_d, double* dy_l, double* dy_u,
-                       double epsilon, int& maxit){
+                       double epsilon, int& maxit, int ixs){
 
     double max_it_local = maxit;
     maxit = 0;
+    // tau parameter
     double tau = 1;
+    // norm of residual vector r
+    double rnorm = 0;
+    double tmp = 0;
+    // (Aw, corr) and (iP*Aw, Aw) dot products
+    double dp_Aw_corr = 0, dp_iPmAw_Aw = 0;
 
     // matrix always is square so we can split this way
-    int m = sqrt(iP.rows());
-    int n = m, i, k = 0;
+    int m = iP.rows();
+    int n = sqrt(m), i, k = 0;
 
     while(maxit++ < max_it_local){
 
-        //r = &(f - A*x);
+        //computing r and norm(r)
+        //r = f - A*x
+        rnorm = 0;
+        r[0] = f[0] - ap[0]*x[0] - an[0]*x[1] - ae[0]*x[ixs];
+        rnorm = maxd(rnorm, r[0], tmp);
+        for (k = 1; k<ixs; k++){
+            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs];
+            rnorm = maxd(rnorm, r[k], tmp);
+        }
+
+        for (k = ixs; k<m-ixs; k++){
+            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
+                    - aw[k-ixs]*x[k-ixs];
+            rnorm = maxd(rnorm, r[k], tmp);
+        }
+
+        for (k = m-ixs; k<m-1; i++){
+            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - aw[k-ixs]*x[k-ixs];
+            rnorm = maxd(rnorm, r[k], tmp);
+        }
+
+        k = m-1;
+        r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - aw[k-ixs]*x[k-ixs];
+        rnorm = maxd(rnorm, r[k], tmp);
 
 
-    //many things to add
+    //parallel computing corr - correction on each step using tridiagonal matrix method
 
+        #pragma omp parallel for shared(dx_d, dx_l, dx_u, r, tmp_v) \
+                                    firstprivate(n) private(i, k) \
+                                    schedule(static)
+        for (i = 0; i<n; i++){
+            k = i*n;
+            TDMA_opt(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &r[k], n);
+        }
+
+        #pragma omp parallel for shared(dy_d, dy_l, dy_u, tmp_v, corr) \
+                                firstprivate(n) private(i, k) \
+                                schedule(static)
+        for (i = 0; i<n; i++){
+            k = i*n;
+            TDMA_opt(&dy_l[k], &dy_d[k], &dy_u[k], &corr[k], &tmp_v[k], n);
+        }
+
+    //computing Aw = A*corr and dot product (Aw, corr)
+        dp_Aw_corr = 0;
+        Aw[0] = ap[0]*corr[0] + an[0]*corr[1] + ae[0]*corr[ixs];
+        dp_Aw_corr += Aw[0]*corr[0];
+        for (k = 1; k<ixs; k++){
+            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs];
+            dp_Aw_corr += Aw[k]*corr[k];
+        }
+
+        for (k = ixs; k<m-ixs; k++){
+            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
+                    + aw[k-ixs]*corr[k-ixs];
+            dp_Aw_corr += Aw[k]*corr[k];
+        }
+
+        for (k = m-ixs; k<m-1; i++){
+            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + aw[k-ixs]*corr[k-ixs];
+            dp_Aw_corr += Aw[k]*corr[k];
+        }
+
+        k = m-1;
+        Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + aw[k-ixs]*corr[k-ixs];
+        dp_Aw_corr += Aw[k]*corr[k];
+
+
+    //computing dot product (iP*Aw; Aw) . maybe in same time than (Aw, corr) dot product
+
+
+        //here U must compute dot product!!!
+
+
+    //computing tau
+        tau = dp_Aw_corr / dp_iPmAw_Aw;
+
+    //computes new approximation of x
+        for (k = 0; k<m; k++)
+            x[k] += corr[k]*tau;
+
+        if (rnorm < epsilon) break;
+        if (maxit == max_it_local)
+            std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
     }
 
     return;
