@@ -80,7 +80,7 @@ void measure_poiss(int parts){
 int main(int argc, char *argv[])
 {
 
-    int m = 5;
+    /*int m = 5;
 
     MatrixXd a(m, m);
     VectorXd b(m);
@@ -114,9 +114,9 @@ int main(int argc, char *argv[])
     }
 
     for (int i = 0; i<m; i++)
-        cout << tmp[i] << endl;
+        cout << tmp[i] << endl;*/
 
-    //measure_poiss(10);
+    measure_poiss(10);
 
     /*SRWVector& v = Eigen3Vector(5);
     v.print();*/

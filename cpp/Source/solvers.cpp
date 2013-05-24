@@ -89,8 +89,88 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
 
     //HARDCORE CALL
 
+    /*par2DPreconditioner& precond = *(new par2DPreconditioner(.6, n, h1, "par.SSOR"));
+
+    int ixs = I-2;
+
+    double* ap = new double[n];
+    double* as = new double[n-1];
+    double* an = new double[n-1];
+    double* ae = new double[n-ixs];
+    double* aw = new double[n-ixs];
+    double* f = new double[n];
+    double* x_slv = new double[n];
+    double **iP = new double*[n];
+    for (int i = 0; i<n; i++)
+            iP[i] = new double[n];
+    double* r = new double[n];
+    double* corr = new double[n];
+    double* tmp_v = new double[n];
+    double* Aw = new double[n];
+    double* dx_d = new double[n];
+    double* dx_l = new double[n-1];
+    double* dx_u = new double[n-1];
+    double* dy_d = new double[n];
+    double* dy_l = new double[n-1];
+    double* dy_u = new double[n-1];
+
+    //fill parameters of MINCORR_omp()
+    SRWVector& tv = A.diag(0);
+    for (int i = 0; i<n; i++)
+        ap[i] = tv(i);
+    tv = A.diag(1);
+    for (int i = 0; i<(n-1); i++)
+        an[i] = tv(i);
+    tv = A.diag(-1);
+    for (int i = 0; i<(n-1); i++)
+        as[i] = tv(i);
+    tv = A.diag(ixs);
+    for (int i = 0; i<(n-ixs); i++)
+        ae[i] = tv(i);
+    tv = A.diag(-ixs);
+    for (int i = 0; i<(n-ixs); i++)
+        aw[i] = tv(i);
+
+    for (int i = 0; i<n; i++)
+        f[i] = b(i);
+    for (int i = 0; i<n; i++)
+        x_slv[i] = 0;
+
+    for (int i = 0; i<n; i++)
+        for (int j = 0; j<n; j++)
+            iP[i][j] = precond.iP()(i, j);
+
+    tv = precond.Dx().diag(0);
+    for (int i = 0; i<n; i++)
+        dx_d[i] = tv[i];
+    tv = precond.Dx().diag(-1);
+    for (int i = 0; i<(n-1); i++)
+        dx_l[i] = tv[i];
+    tv = precond.Dx().diag(1);
+    for (int i = 0; i<(n-1); i++)
+        dx_u[i] = tv[i];
 
 
+    tv = precond.Dy().diag(0);
+    for (int i = 0; i<n; i++)
+        dy_d[i] = tv[i];
+    tv = precond.Dy().diag(-1);
+    for (int i = 0; i<(n-1); i++)
+        dy_l[i] = tv[i];
+    tv = precond.Dy().diag(1);
+    for (int i = 0; i<(n-1); i++)
+        dy_u[i] = tv[i];
+
+
+    double time = omp_get_wtime();
+    MINCORR_omp(ap, an, as, ae, aw, f, x_slv, iP, r, corr, tmp_v,
+                Aw, dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, 1e-5, maxit, ixs, n);
+    time = omp_get_wtime() - time;
+    std::cout << "OMP_TIME =" << time << std::endl << std::endl;
+
+
+    for(int i =0; i<n; i++)
+        solve(i) = x_slv[i];*/
 
 
     //HARDCORE CALL END

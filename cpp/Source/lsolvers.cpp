@@ -288,7 +288,7 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
                        double* corr, double* tmp_v, double* Aw,
                        double* dx_d, double* dx_l, double* dx_u,
                        double* dy_d, double* dy_l, double* dy_u,
-                       double epsilon, int& maxit, int ixs){
+                       double epsilon, int& maxit, int ixs, int m){
 
     double max_it_local = maxit;
     maxit = 0;
@@ -301,7 +301,7 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
     double dp_Aw_corr = 0, dp_iPmAw_Aw = 0;
 
     // matrix always is square so we can split this way
-    int m = iP.rows();
+    //int m = iP.rows();
     int n = sqrt(m), i, j, k = 0;
 
     while(maxit++ < max_it_local){
