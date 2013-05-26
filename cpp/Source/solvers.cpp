@@ -49,6 +49,7 @@ SRWVector& form_b_vector(Test2DPoissonSquareArea& test, int n,
     return b;
 }
 
+
 SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
                                  int I, int J, int &maxit){
     double h1 = test.a / (I-1), h2 = test.b / (J-1);
@@ -80,16 +81,16 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
                     *(new par2DPreconditioner(.6, n, h1, "par.SSOR")),
                     solve, 1e-5, maxit);*/
 
-    solve = MINCORR_omp_slow(A, b,
+    /*solve = MINCORR_omp_slow(A, b,
                     *(new par2DPreconditioner(.6, n, h1, "par.SSOR")),
-                    solve, 1e-5, maxit);
+                    solve, 1e-5, maxit);*/
 
 
 
 
     //HARDCORE CALL
 
-    /*par2DPreconditioner& precond = *(new par2DPreconditioner(.6, n, h1, "par.SSOR"));
+    par2DPreconditioner& precond = *(new par2DPreconditioner(.6, n, h1, "par.SSOR"));
 
     int ixs = I-2;
 
@@ -134,7 +135,7 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     for (int i = 0; i<n; i++)
         f[i] = b(i);
     for (int i = 0; i<n; i++)
-        x_slv[i] = 0;
+        x_slv[i] = solve(i);
 
     for (int i = 0; i<n; i++)
         for (int j = 0; j<n; j++)
@@ -166,11 +167,12 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     MINCORR_omp(ap, an, as, ae, aw, f, x_slv, iP, r, corr, tmp_v,
                 Aw, dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, 1e-5, maxit, ixs, n);
     time = omp_get_wtime() - time;
+
     std::cout << "OMP_TIME =" << time << std::endl << std::endl;
 
 
     for(int i =0; i<n; i++)
-        solve(i) = x_slv[i];*/
+        solve(i) = x_slv[i];
 
 
     //HARDCORE CALL END

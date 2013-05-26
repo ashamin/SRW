@@ -232,29 +232,26 @@ SRWVector& MINCORR_omp_slow(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
 
         r = &(f - A*x);
 
-
         #pragma omp parallel for shared(sub_mtrs_Dx, r, tmp_v, tmp_solve) \
                                     firstprivate(n) private(i, k) \
                                     schedule(static)
         for (i = 0; i<n; i++){
             k = (i*n);
-            //TDMA(*sub_mtrs_Dx.at(i), *tmp_v.at(i), r->segment(k, n));
             TDMA(*sub_mtrs_Dx[i], *tmp_v[i], r->segment(k, n));
         }
+
 
         #pragma omp parallel for shared(sub_mtrs_Dy, tmp_v, tmp_corr, tmp_solve) \
                                     firstprivate(n) private(i, k) \
                                     schedule(static)
         for (i = 0; i<n; i++){
             k = (i*n);
-            //TDMA(*sub_mtrs_Dy.at(i), *tmp_corr.at(i), *tmp_v.at(i));
             TDMA(*sub_mtrs_Dy[i], *tmp_corr[i], *tmp_v[i]);
         }
 
         corr.resize(0);
         for (int i = 0; i<n; i++)
             corr = corr.glue(corr, *tmp_corr.at(i));
-
 
         Aw = &(A*corr);
 
@@ -322,7 +319,7 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
             rnorm = maxd(rnorm, r[k], tmp);
         }
 
-        for (k = m-ixs; k<m-1; i++){
+        for (k = m-ixs; k<m-1; k++){
             r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - aw[k-ixs]*x[k-ixs];
             rnorm = maxd(rnorm, r[k], tmp);
         }
@@ -330,7 +327,6 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         k = m-1;
         r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - aw[k-ixs]*x[k-ixs];
         rnorm = maxd(rnorm, r[k], tmp);
-
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
@@ -365,7 +361,7 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
             dp_Aw_corr += Aw[k]*corr[k];
         }
 
-        for (k = m-ixs; k<m-1; i++){
+        for (k = m-ixs; k<m-1; k++){
             Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + aw[k-ixs]*corr[k-ixs];
             dp_Aw_corr += Aw[k]*corr[k];
         }
@@ -374,16 +370,16 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + aw[k-ixs]*corr[k-ixs];
         dp_Aw_corr += Aw[k]*corr[k];
 
-
     //computing dot product (iP*Aw; Aw) . maybe in same time with (Aw, corr) dot product
 
         dp_iPmAw_Aw = 0;
+        tmp = 0;
         for (i = 0; i<m; i++){
             for (j = 0; j<m; j++)
                 tmp += iP[i][j]*Aw[j];
             dp_iPmAw_Aw += tmp*Aw[i];
+            tmp = 0;
         }
-
 
     //computing tau
         tau = dp_Aw_corr / dp_iPmAw_Aw;

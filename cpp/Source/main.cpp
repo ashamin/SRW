@@ -80,50 +80,7 @@ void measure_poiss(int parts){
 int main(int argc, char *argv[])
 {
 
-    /*int m = 5;
-
-    MatrixXd a(m, m);
-    VectorXd b(m);
-    for (int i = 0; i<m; i++){
-        b(i) = i;
-        for (int j = 0; j<m; j++)
-            a(i, j) = i+j;
-    }
-
-    cout << a*b << endl << endl;
-
-
-
-    double** iP = new double*[m];
-    for (int i = 0; i<m; i++)
-        iP[i] = new double[m];
-
-    double* x = new double[m];
-
-    for (int i = 0; i<m; i++){
-        x[i] = i;
-        for (int j = 0; j<m; j++)
-            iP[i][j] = i+j;
-    }
-
-    double* tmp = new double[m];
-
-    for (int i = 0; i<m; i++){
-        for (int j = 0; j<m; j++)
-            tmp[i] += iP[i][j]*x[j];
-    }
-
-    for (int i = 0; i<m; i++)
-        cout << tmp[i] << endl;*/
-
-    measure_poiss(10);
-
-    /*SRWVector& v = Eigen3Vector(5);
-    v.print();*/
-
-    /*VectorXd a(10);
-
-    a = a.transpose();*/
+    measure_poiss(30);
 
 
     return 0;
