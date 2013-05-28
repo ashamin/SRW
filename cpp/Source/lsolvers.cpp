@@ -319,10 +319,20 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
             rnorm = maxd(rnorm, r[k], tmp);
         }
 
+#pragma omp parallel for shared(r, f, as, ap, an, ae, aw, x) \
+    firstprivate(m, ixs) private(k, tmp) \
+    schedule(static)
         for (k = ixs; k<m-ixs; k++){
             r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
                     - aw[k-ixs]*x[k-ixs];
-            rnorm = maxd(rnorm, r[k], tmp);
+
+            tmp = fabs(r[k]);
+            if (rnorm > tmp)
+#pragma omp critical
+                if (rnorm > tmp)
+                    rnorm = tmp;
+
+            //rnorm = maxd(rnorm, r[k], tmp);
         }
 
         for (k = m-ixs; k<m-1; k++){
@@ -336,9 +346,10 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
-        #pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v, corr) \
-                                    firstprivate(n) private(i, k) \
-                                    schedule(static)
+#pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v, corr) \
+    firstprivate(n) private(i, k) \
+    schedule(static)
+
         for (i = 0; i<n; i++){
             k = i*n;
             TDMA_opt(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &r[k], n);
@@ -354,9 +365,11 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
             dp_Aw_corr += Aw[k]*corr[k];
         }
 
-        #pragma omp parallel for shared(Aw, as, ap, an, ae, aw, corr) \
-                                    firstprivate(ixs, m) private(k) \
-                                    reduction(+:dp_Aw_corr)
+#pragma omp parallel for shared(Aw, as, ap, an, ae, aw, corr) \
+    firstprivate(ixs, m) private(k) \
+    schedule(static) \
+    reduction(+:dp_Aw_corr)
+
         for (k = ixs; k<m-ixs; k++){
             Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
                     + aw[k-ixs]*corr[k-ixs];
@@ -377,9 +390,11 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         dp_iPmAw_Aw = 0;
         tmp = 0;
 
-        #pragma omp parallel for shared(iP, Aw) \
-                                    firstprivate(m, tmp) private (i, j) \
-                                    reduction(+:dp_iPmAw_Aw)
+#pragma omp parallel for shared(iP, Aw) \
+    firstprivate(m, tmp) private (i, j) \
+    reduction(+:dp_iPmAw_Aw) \
+    schedule(static)
+
         for (i = 0; i<m; i++){
             for (j = 0; j<m; j++)
                 tmp += iP[i][j]*Aw[j];
@@ -392,7 +407,8 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
     //computes new approximation of x
         #pragma omp parallel for shared(corr, x) \
-                                    firstprivate(m, tau) private(k)
+                                    firstprivate(m, tau) private(k) \
+                                    schedule(static)
         for (k = 0; k<m; k++)
             x[k] += corr[k]*tau;
 

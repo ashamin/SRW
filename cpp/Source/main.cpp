@@ -80,7 +80,7 @@ void measure_poiss(int parts){
 int main(int argc, char *argv[])
 {
 
-    measure_poiss(30);
+    measure_poiss(40);
 
 
     return 0;
