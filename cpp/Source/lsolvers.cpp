@@ -275,6 +275,7 @@ inline double maxd(double& v1, double& v2, double& tmp){
     return (v1 > tmp) ? v1 : tmp;
 }
 
+
 // ixs = int_x_splits - means internal x splits. it's value computed by substracting
 //  2 from x_splits. so it's value that shows number of x_splits without splits
 //  near borders
@@ -286,6 +287,11 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
                        double* dx_d, double* dx_l, double* dx_u,
                        double* dy_d, double* dy_l, double* dy_u,
                        double epsilon, int& maxit, int ixs, int m){
+
+    /*omp_set_dynamic(0);
+    omp_set_num_threads(omp_get_max_threads());
+    std::cout << omp_get_num_threads() << std::endl << std::endl;*/
+    //std::cout << omp_thread_count() << std::endl << std::endl;
 
     double max_it_local = maxit;
     maxit = 0;
@@ -330,19 +336,12 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
-        #pragma omp parallel for shared(dx_d, dx_l, dx_u, r, tmp_v) \
+        #pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v, corr) \
                                     firstprivate(n) private(i, k) \
                                     schedule(static)
         for (i = 0; i<n; i++){
             k = i*n;
             TDMA_opt(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &r[k], n);
-        }
-
-        #pragma omp parallel for shared(dy_d, dy_l, dy_u, tmp_v, corr) \
-                                firstprivate(n) private(i, k) \
-                                schedule(static)
-        for (i = 0; i<n; i++){
-            k = i*n;
             TDMA_opt(&dy_l[k], &dy_d[k], &dy_u[k], &corr[k], &tmp_v[k], n);
         }
 
@@ -355,6 +354,9 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
             dp_Aw_corr += Aw[k]*corr[k];
         }
 
+        #pragma omp parallel for shared(Aw, as, ap, an, ae, aw, corr) \
+                                    firstprivate(ixs, m) private(k) \
+                                    reduction(+:dp_Aw_corr)
         for (k = ixs; k<m-ixs; k++){
             Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
                     + aw[k-ixs]*corr[k-ixs];
@@ -374,6 +376,10 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
         dp_iPmAw_Aw = 0;
         tmp = 0;
+
+        #pragma omp parallel for shared(iP, Aw) \
+                                    firstprivate(m, tmp) private (i, j) \
+                                    reduction(+:dp_iPmAw_Aw)
         for (i = 0; i<m; i++){
             for (j = 0; j<m; j++)
                 tmp += iP[i][j]*Aw[j];
@@ -385,6 +391,8 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         tau = dp_Aw_corr / dp_iPmAw_Aw;
 
     //computes new approximation of x
+        #pragma omp parallel for shared(corr, x) \
+                                    firstprivate(m, tau) private(k)
         for (k = 0; k<m; k++)
             x[k] += corr[k]*tau;
 

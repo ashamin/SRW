@@ -49,6 +49,12 @@ SRWVector& form_b_vector(Test2DPoissonSquareArea& test, int n,
     return b;
 }
 
+int omp_thread_count() {
+    int n = 0;
+    #pragma omp parallel reduction(+:n)
+        n += 1;
+    return n;
+}
 
 SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
                                  int I, int J, int &maxit){
@@ -163,12 +169,19 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
         dy_u[i] = tv[i];
 
 
+    std::cout << omp_thread_count() << std::endl;
+
+    omp_set_dynamic(0);
+    omp_set_num_threads(omp_get_max_threads());
+
     double time = omp_get_wtime();
     MINCORR_omp(ap, an, as, ae, aw, f, x_slv, iP, r, corr, tmp_v,
                 Aw, dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, 1e-5, maxit, ixs, n);
     time = omp_get_wtime() - time;
 
     std::cout << "OMP_TIME =" << time << std::endl << std::endl;
+
+    std::cout << omp_thread_count() << std::endl;
 
 
     for(int i =0; i<n; i++)
