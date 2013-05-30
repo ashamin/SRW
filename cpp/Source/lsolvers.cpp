@@ -270,11 +270,125 @@ SRWVector& MINCORR_omp_slow(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
     return x;
 }
 
-inline double maxd(double& v1, double& v2, double& tmp){
+inline void maxd(double& v1, double& v2, double& tmp){
     tmp = fabs(v2);
-    return (v1 > tmp) ? v1 : tmp;
+    //return (v1 > tmp) ? v1 : tmp;
+    if (v1 < tmp) v1 = tmp;
 }
 
+void MINCORR_opt(double* ap, double* an, double* as, double* ae, double* aw,
+                       double* f, double* x, double** iP, double* r,
+                       double* corr, double* Aw,
+                       double epsilon, int& maxit, int ixs, int m){
+
+    double max_it_local = maxit;
+    maxit = 0;
+    // tau parameter
+    double tau = 1;
+    // norm of residual vector r
+    double rnorm = 0;
+    double tmp = 0;
+    // (Aw, corr) and (iP*Aw, Aw) dot products
+    double dp_Aw_corr = 0, dp_iPmAw_Aw = 0;
+    // matrix always is square so we can split this way
+    //int m = iP.rows();
+    int n = sqrt(m), i, j, k = 0;
+
+
+    while(maxit++ < max_it_local){
+
+        //computing r and norm(r)
+        //r = f - A*x
+        rnorm = 0;
+        r[0] = f[0] - ap[0]*x[0] - an[0]*x[1] - ae[0]*x[ixs];
+        maxd(rnorm, r[0], tmp);
+        for (k = 1; k<ixs; k++){
+            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs];
+            maxd(rnorm, r[k], tmp);
+        }
+
+        for (k = ixs; k<m-ixs; k++){
+            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
+                    - aw[k-ixs]*x[k-ixs];
+            maxd(rnorm, r[k], tmp);
+        }
+
+        for (k = m-ixs; k<m-1; k++){
+            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - aw[k-ixs]*x[k-ixs];
+            maxd(rnorm, r[k], tmp);
+        }
+
+        k = m-1;
+        r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - aw[k-ixs]*x[k-ixs];
+        maxd(rnorm, r[k], tmp);
+
+    //parallel computing corr - correction on each step using tridiagonal matrix method
+
+
+        ////// corr computing
+        //SRWVector& w = iP*r;
+        //SRWVector& Aw = A*w;
+        tmp = 0;
+
+        for (i = 0; i<m; i++){
+            corr[i] = 0;
+            for (j = 0; j<m; j++)
+                corr[i] += iP[i][j]*r[j];
+        }
+
+
+
+    //computing Aw = A*corr and dot product (Aw, corr)
+        dp_Aw_corr = 0;
+        Aw[0] = ap[0]*corr[0] + an[0]*corr[1] + ae[0]*corr[ixs];
+        dp_Aw_corr += Aw[0]*corr[0];
+        for (k = 1; k<ixs; k++){
+            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs];
+            dp_Aw_corr += Aw[k]*corr[k];
+        }
+
+        for (k = ixs; k<m-ixs; k++){
+            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
+                    + aw[k-ixs]*corr[k-ixs];
+            dp_Aw_corr += Aw[k]*corr[k];
+        }
+
+        for (k = m-ixs; k<m-1; k++){
+            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + aw[k-ixs]*corr[k-ixs];
+            dp_Aw_corr += Aw[k]*corr[k];
+        }
+
+        k = m-1;
+        Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + aw[k-ixs]*corr[k-ixs];
+        dp_Aw_corr += Aw[k]*corr[k];
+
+    //computing dot product (iP*Aw; Aw) . maybe in same time with (Aw, corr) dot product
+
+        dp_iPmAw_Aw = 0;
+        tmp = 0;
+
+        for (i = 0; i<m; i++){
+            for (j = 0; j<m; j++)
+                tmp += iP[i][j]*Aw[j];
+            dp_iPmAw_Aw += tmp*Aw[i];
+            tmp = 0;
+        }
+
+    //computing tau
+        tau = dp_Aw_corr / dp_iPmAw_Aw;
+
+    //computes new approximation of x
+        for (k = 0; k<m; k++)
+            x[k] += corr[k]*tau;
+
+        if (rnorm < epsilon) break;
+        if (maxit == max_it_local)
+            std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
+    }
+
+    return;
+
+}
 
 // ixs = int_x_splits - means internal x splits. it's value computed by substracting
 //  2 from x_splits. so it's value that shows number of x_splits without splits
@@ -287,11 +401,6 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
                        double* dx_d, double* dx_l, double* dx_u,
                        double* dy_d, double* dy_l, double* dy_u,
                        double epsilon, int& maxit, int ixs, int m){
-
-    /*omp_set_dynamic(0);
-    omp_set_num_threads(omp_get_max_threads());
-    std::cout << omp_get_num_threads() << std::endl << std::endl;*/
-    //std::cout << omp_thread_count() << std::endl << std::endl;
 
     double max_it_local = maxit;
     maxit = 0;
@@ -313,10 +422,10 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         //r = f - A*x
         rnorm = 0;
         r[0] = f[0] - ap[0]*x[0] - an[0]*x[1] - ae[0]*x[ixs];
-        rnorm = maxd(rnorm, r[0], tmp);
+        maxd(rnorm, r[0], tmp);
         for (k = 1; k<ixs; k++){
             r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs];
-            rnorm = maxd(rnorm, r[k], tmp);
+            maxd(rnorm, r[k], tmp);
         }
 
 #pragma omp parallel for shared(r, f, as, ap, an, ae, aw, x) \
@@ -337,12 +446,12 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
         for (k = m-ixs; k<m-1; k++){
             r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - aw[k-ixs]*x[k-ixs];
-            rnorm = maxd(rnorm, r[k], tmp);
+            maxd(rnorm, r[k], tmp);
         }
 
         k = m-1;
         r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - aw[k-ixs]*x[k-ixs];
-        rnorm = maxd(rnorm, r[k], tmp);
+        maxd(rnorm, r[k], tmp);
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
@@ -406,9 +515,10 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         tau = dp_Aw_corr / dp_iPmAw_Aw;
 
     //computes new approximation of x
-        #pragma omp parallel for shared(corr, x) \
-                                    firstprivate(m, tau) private(k) \
-                                    schedule(static)
+#pragma omp parallel for shared(corr, x) \
+    firstprivate(m, tau) private(k) \
+    schedule(static)
+
         for (k = 0; k<m; k++)
             x[k] += corr[k]*tau;
 

@@ -169,7 +169,7 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
         dy_u[i] = tv[i];
 
 
-    std::cout << omp_thread_count() << std::endl;
+    /*std::cout << omp_thread_count() << std::endl;
 
     omp_set_dynamic(0);
     omp_set_num_threads(omp_get_max_threads());
@@ -181,7 +181,25 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
 
     std::cout << "OMP_TIME =" << time << std::endl << std::endl;
 
-    std::cout << omp_thread_count() << std::endl;
+    std::cout << omp_thread_count() << std::endl;*/
+
+
+
+
+    Preconditioner& precond1 = *(new Preconditioner(A, 1, "SSOR"));
+    for (int i = 0; i<n; i++)
+        for (int j = 0; j<n; j++)
+            iP[i][j] = precond1.iP()(i, j);
+
+    clock_t ctime;
+    ctime = clock();
+
+    MINCORR_opt(ap, an, as, ae, aw, f, x_slv, iP, r, corr, Aw, 1e-5, maxit, ixs, n);
+
+    ctime = clock() - ctime;
+    std::cout << "ITERATIVE_SSOR = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;
+
+
 
 
     for(int i =0; i<n; i++)
@@ -189,8 +207,6 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
 
 
     //HARDCORE CALL END
-
-
 
 
 

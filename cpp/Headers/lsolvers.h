@@ -50,6 +50,11 @@ SRWVector& seq_par_MINCORR(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
 SRWVector& MINCORR_omp_slow(SRWMatrix& A, SRWVector& f, par2DPreconditioner& P,
                        SRWVector& x, double epsilon, int &maxit);
 
+void MINCORR_opt(double* ap, double* an, double* as, double* ae, double* aw,
+                       double* f, double* x, double** iP, double* r,
+                       double* corr, double* Aw,
+                       double epsilon, int& maxit, int ixs, int m);
+
 void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
                        double* f, double* x, double** iP, double* r,
                        double* corr, double* tmp_v, double* Aw,
