@@ -7,12 +7,17 @@
 #                      sseO2=timingO2$sseO2, O2=timingO2$O2,
 #                      sseOx=timingOx$sseOx, Ox=timingOx$Ox)
 
-timing <- read.csv("R/data/performance.tests/test.test.csv")
-
-
+# timing <- read.csv("R/data/report2013/perf.csv")
+# 
+# SSOR <- timing$SSOR
+# SSOR.par <- timing$par_SSOR
+# 
+# timing <- data.frame(its=c(0, 15, timing$its[-1]), core2=c(0, 0.67, (timing$core2/timing$core2.par)[-1]), i5=c(0, 0.4, (timing$i5/timing$i5.par)[-1]),
+#                      i7=c(0, 0.5, (timing$i7/timing$i7.par)[-1]))
+timing <- read.csv("R/data/ololo.csv")
 
 plot.timing <- function(plot.title="Сравнение производительности",
-                        x.label="Размерность входных данных", y.label="Время (с)"){
+                        x.label="Размерность матрицы", y.label="Время выполнения (мс.)"){
   steps = seq(1, length(timing$its), length(timing$its)/5)
   
   xlimit = c(0, max(timing$its))
@@ -30,10 +35,29 @@ plot.timing <- function(plot.title="Сравнение производител�
   }
   m = length(timing)-1
   #first value - upper left corner, second - lower rigth
-  y.legend.corner.coords = c(10, 13)
-  legend(c(0, 5), y.legend.corner.coords, legend=c(names(timing)[-1]), col=mode.col, 
+  y.legend.corner.coords = c(10, 7)
+  legend(c(0, 800), y.legend.corner.coords, legend=c(names(timing)[-1]), col=mode.col, 
          pch=rep(19, times=m), cex=rep(.8, times=m), y.intersp=.5, x.intersp=.5)
   
-  title("Сравнение производительности")
+  title(plot.title)
   
 }
+
+
+# plot.div <- function(){
+#   plot(timing$its[-1], (timing$SSOR/timing$par_SSOR)[-1], type="l", 
+#        xlab="Количество разбиений", ylab="Отношение количества итераций")
+#   title("График соотношения количества итераций при использовании
+#         последовательного и параллельного предобуславливатей \n с изменением количества разбиений")
+#   print(timing$SSOR/timing$par_SSOR)
+# }
+# 
+# s <- read.csv("R/data/report2013/solve4.csv")
+# 
+# temperaturegram <- function(I, J, a, b, h1=a/(I-1), h2=b/(J-1)){
+#   x <- seq(from=0, to=a, by=h1)
+#   y <- seq(from=0, to=b, by=h2)
+#   sl <- matrix(s$solve, (I-2), (J-2), byrow=FALSE)
+#   image(x[2:(I-1)], y[2:(J-1)], sl, xlab="", ylab="")
+#   title("Решение 4")
+# }

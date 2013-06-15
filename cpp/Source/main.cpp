@@ -67,6 +67,19 @@ void measure_poiss(int parts){
     //print_perf_measurement(I, (ra - sl).norm("F")/sl.norm("F"), itnum, time);
 
 
+    fstream out;
+    out.open("solve.csv", ios::in | ios::out);
+    out << "solve" << endl;
+
+    int cl = sl.cols(), rs = sl.rows();
+
+    for (int i = 0; i<cl; i++)
+        for (int j = 0; j<rs; j++)
+            out << sl(j,i) << endl;
+
+    out.close();
+
+
     /*cout << "Frobenius norm of error" << "\t\t" << "iteration number" << endl;*/
     cout << time<< endl;
     cout << I << "\t\t\t" <<  (ra - sl).norm("F")/sl.norm("F") << "\t\t\t" << itnum << endl << endl;
