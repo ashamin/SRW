@@ -473,3 +473,175 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
 
 
+void MINRES(double* ap, double* an, double* as, double* ae, double* aw,
+            double* f, double* x, double** iP, double* r,
+            double* corr, double* Aw,
+            double epsilon, int& maxit, int ixs, int m){
+
+    double max_it_local = maxit;
+    maxit = 0;
+    // tau parameter
+    double tau = 1;
+    // norm of residual vector r
+    double rnorm = 0;
+    double tmp = 0;
+    // (Aw, r) and (Aw, Aw) dot products
+    double dp_Aw_r = 0, dp_Aw_Aw = 0;
+    // matrix always is square so we can split this way
+    //int m = iP.rows();
+    int n = sqrt(m), i, j, k = 0;
+
+
+    while(maxit++ < max_it_local){
+
+        //computing r and norm(r)
+        //r = f - A*x
+        rnorm = 0;
+
+        for (k = 0; k<m; k++){
+            r[k] = f[k] - as[k]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
+                    - aw[k]*x[k-ixs];
+            maxd(rnorm, r[k], tmp);
+        }
+
+    //computing corr - correction on each step using tridiagonal matrix method
+
+
+        ////// corr computing
+        //SRWVector& w = iP*r;
+        //SRWVector& Aw = A*w;
+        tmp = 0;
+
+        for (i = 0; i<m; i++){
+            corr[i] = 0;
+            for (j = 0; j<m; j++)
+                corr[i] += iP[i][j]*r[j];
+        }
+
+
+    //computing Aw = A*corr and dot product (Aw, corr)
+        dp_Aw_r = 0;
+        dp_Aw_Aw = 0;
+
+        for (k = 0; k<m; k++){
+            Aw[k] = as[k]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
+                    + aw[k]*corr[k-ixs];
+            dp_Aw_r += Aw[k]*r[k];
+
+            dp_Aw_Aw += Aw[k]*Aw[k];
+        }
+
+
+    //computing tau
+        tau = dp_Aw_r / dp_Aw_Aw;
+
+        //std::cout << tau << std::endl;
+
+    //computes new approximation of x
+        for (k = 0; k<m; k++)
+            x[k] += corr[k]*tau;
+
+        if (rnorm < epsilon) break;
+        if (maxit == max_it_local)
+            std::cout << "Iteration process obviously won't converge. \n Try to increase \" maxit \" value" << std::endl;
+    }
+
+    return;
+}
+
+
+
+
+
+
+void MINRES_omp(double* ap, double* an, double* as, double* ae, double* aw,
+                       double* f, double* x, double** iP, double* r,
+                       double* corr, double* tmp_v, double* Aw,
+                       double* dx_d, double* dx_l, double* dx_u,
+                       double* dy_d, double* dy_l, double* dy_u,
+                       double epsilon, int& maxit, int ixs, int m){
+
+    double max_it_local = maxit;
+    maxit = 0;
+    // tau parameter
+    double tau = 1;
+    // norm of residual vector r
+    double rnorm = 0;
+    double tmp = 0;
+    // (Aw, r) and (Aw, Aw) dot products
+    double dp_Aw_r = 0, dp_Aw_Aw = 0;
+
+    // matrix always is square so we can split this way
+    //int m = iP.rows();
+    int n = sqrt(m), i, j, k = 0;
+
+    while(maxit++ < max_it_local){
+
+        //computing r and norm(r)
+        //r = f - A*x
+        rnorm = 0;
+
+#pragma omp parallel for shared(r, f, as, ap, an, ae, aw, x) \
+    firstprivate(m, ixs) private(k, tmp) \
+    schedule(static)
+        for (k = 0; k<m; k++){
+            r[k] = f[k] - as[k]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
+                    - aw[k]*x[k-ixs];
+
+            tmp = fabs(r[k]);
+            if (rnorm < tmp)
+#pragma omp critical
+                if (rnorm < tmp)
+                    rnorm = tmp;
+
+            //rnorm = maxd(rnorm, r[k], tmp);
+        }
+
+    //parallel computing corr - correction on each step using tridiagonal matrix method
+
+#pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v, corr) \
+    firstprivate(n) private(i, k) \
+    schedule(static)
+
+        for (i = 0; i<n; i++){
+            k = i*n;
+            TDMA_opt(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &r[k], n);
+            TDMA_opt(&dy_l[k], &dy_d[k], &dy_u[k], &corr[k], &tmp_v[k], n);
+        }
+
+    //computing Aw = A*r and dot products (Aw, r) and (Aw, Aw)
+        dp_Aw_r = 0;
+        dp_Aw_Aw = 0;
+
+#pragma omp parallel for shared(Aw, as, ap, an, ae, aw, corr) \
+    firstprivate(ixs, m) private(k) \
+    schedule(static) \
+    reduction(+:dp_Aw_r, dp_Aw_Aw)
+
+        for (k = 0; k<m; k++){
+            Aw[k] = as[k]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
+                    + aw[k]*corr[k-ixs];
+
+            dp_Aw_r += Aw[k]*r[k];
+            dp_Aw_Aw += Aw[k]*Aw[k];
+        }
+
+    //computing tau
+        tau = dp_Aw_r / dp_Aw_Aw;
+
+    //computes new approximation of x
+#pragma omp parallel for shared(corr, x) \
+    firstprivate(m, tau) private(k) \
+    schedule(static)
+
+        for (k = 0; k<m; k++)
+            x[k] += corr[k]*tau;
+
+        if (rnorm < epsilon) break;
+        if (maxit == max_it_local)
+            std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
+    }
+
+    return;
+}
+

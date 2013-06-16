@@ -97,7 +97,10 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
 
     //HARDCORE CALL
 
-    par2DPreconditioner& precond = *(new par2DPreconditioner(.6, n, h1, "par.SSOR"));
+    bool precond_inv = true;
+
+    //par2DPreconditioner& precond = *(new par2DPreconditioner(.6, n, h1, "par.SSOR"));
+    par2DPreconditioner& precond = *(new par2DPreconditioner(.6, n, h1, "par.SSOR", precond_inv));
 
     int ixs = I-2;
 
@@ -109,8 +112,12 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     double* f = new double[n];
     double* x_slv = new double[n];
     double **iP = new double*[n];
-    for (int i = 0; i<n; i++)
-            iP[i] = new double[n];
+
+    if (precond_inv){
+        for (int i = 0; i<n; i++)
+                iP[i] = new double[n];
+    }
+
     double* r = new double[n];
     double* corr = new double[n];
     double* tmp_v = new double[n];
@@ -154,9 +161,12 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     for (int i = 0; i<n; i++)
         x_slv[i] = solve(i);
 
-    for (int i = 0; i<n; i++)
-        for (int j = 0; j<n; j++)
-            iP[i][j] = precond.iP()(i, j);
+
+    if (precond_inv){
+        for (int i = 0; i<n; i++)
+            for (int j = 0; j<n; j++)
+                iP[i][j] = precond.iP()(i, j);
+    }
 
     tv = precond.Dx().diag(0);
     for (int i = 0; i<n; i++)
@@ -179,11 +189,22 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     for (int i = 0; i<(n-1); i++)
         dy_u[i] = tv[i];
 
-    /*print(ap, n);
-    print(an, n);
-    print(as, n);
-    print(ae, n);
-    print(aw, n);*/
+
+
+    std::cout << omp_thread_count() << std::endl;
+
+    omp_set_dynamic(0);
+    omp_set_num_threads(omp_get_max_threads());
+
+    double time = omp_get_wtime();
+    MINRES_omp(ap, an, as, ae, aw, f, x_slv, iP, r, corr, tmp_v,
+                    Aw, dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, 1e-5, maxit, ixs, n);
+    time = omp_get_wtime() - time;
+
+    std::cout << "OMP_TIME MINRES =" << time << std::endl << std::endl;
+
+    std::cout << omp_thread_count() << std::endl;
+
 
 
     /*std::cout << omp_thread_count() << std::endl;
@@ -202,8 +223,10 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
 
 
 
+    // there was time lost because of different preconditioners were used!
 
-    Preconditioner& precond1 = *(new Preconditioner(A, 1, "SSOR"));
+    /*Preconditioner& precond1 = *(new Preconditioner(A, 1, "SSOR"));
+    //Preconditioner& precond1 = *(new par2DPreconditioner(.6, n, h1, "par.SSOR"));
     for (int i = 0; i<n; i++)
         for (int j = 0; j<n; j++)
             iP[i][j] = precond1.iP()(i, j);
@@ -214,8 +237,22 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     MINCORR_opt(ap, an, as, ae, aw, f, x_slv, iP, r, corr, Aw, 1e-5, maxit, ixs, n);
 
     ctime = clock() - ctime;
-    std::cout << "ITERATIVE_SSOR = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;
+    std::cout << "ITERATIVE_SSOR = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;*/
 
+
+
+    /*Preconditioner& precond1 = *(new Preconditioner(A, 1, "SSOR"));
+    for (int i = 0; i<n; i++)
+        for (int j = 0; j<n; j++)
+            iP[i][j] = precond1.iP()(i, j);
+
+    clock_t ctime;
+    ctime = clock();
+
+    MINRES(ap, an, as, ae, aw, f, x_slv, iP, r, corr, Aw, 1e-5, maxit, ixs, n);
+
+    ctime = clock() - ctime;
+    std::cout << "ITERATIVE_SSOR MINRES = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;*/
 
 
 
