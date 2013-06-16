@@ -300,27 +300,12 @@ void MINCORR_opt(double* ap, double* an, double* as, double* ae, double* aw,
         //computing r and norm(r)
         //r = f - A*x
         rnorm = 0;
-        r[0] = f[0] - ap[0]*x[0] - an[0]*x[1] - ae[0]*x[ixs];
-        maxd(rnorm, r[0], tmp);
-        for (k = 1; k<ixs; k++){
-            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs];
+
+        for (k = 0; k<m; k++){
+            r[k] = f[k] - as[k]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
+                    - aw[k]*x[k-ixs];
             maxd(rnorm, r[k], tmp);
         }
-
-        for (k = ixs; k<m-ixs; k++){
-            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
-                    - aw[k-ixs]*x[k-ixs];
-            maxd(rnorm, r[k], tmp);
-        }
-
-        for (k = m-ixs; k<m-1; k++){
-            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - aw[k-ixs]*x[k-ixs];
-            maxd(rnorm, r[k], tmp);
-        }
-
-        k = m-1;
-        r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - aw[k-ixs]*x[k-ixs];
-        maxd(rnorm, r[k], tmp);
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
@@ -340,27 +325,12 @@ void MINCORR_opt(double* ap, double* an, double* as, double* ae, double* aw,
 
     //computing Aw = A*corr and dot product (Aw, corr)
         dp_Aw_corr = 0;
-        Aw[0] = ap[0]*corr[0] + an[0]*corr[1] + ae[0]*corr[ixs];
-        dp_Aw_corr += Aw[0]*corr[0];
-        for (k = 1; k<ixs; k++){
-            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs];
+
+        for (k = 0; k<m; k++){
+            Aw[k] = as[k]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
+                    + aw[k]*corr[k-ixs];
             dp_Aw_corr += Aw[k]*corr[k];
         }
-
-        for (k = ixs; k<m-ixs; k++){
-            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
-                    + aw[k-ixs]*corr[k-ixs];
-            dp_Aw_corr += Aw[k]*corr[k];
-        }
-
-        for (k = m-ixs; k<m-1; k++){
-            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + aw[k-ixs]*corr[k-ixs];
-            dp_Aw_corr += Aw[k]*corr[k];
-        }
-
-        k = m-1;
-        Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + aw[k-ixs]*corr[k-ixs];
-        dp_Aw_corr += Aw[k]*corr[k];
 
     //computing dot product (iP*Aw; Aw) . maybe in same time with (Aw, corr) dot product
 
@@ -421,37 +391,22 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
         //computing r and norm(r)
         //r = f - A*x
         rnorm = 0;
-        r[0] = f[0] - ap[0]*x[0] - an[0]*x[1] - ae[0]*x[ixs];
-        maxd(rnorm, r[0], tmp);
-        for (k = 1; k<ixs; k++){
-            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs];
-            maxd(rnorm, r[k], tmp);
-        }
 
 #pragma omp parallel for shared(r, f, as, ap, an, ae, aw, x) \
     firstprivate(m, ixs) private(k, tmp) \
     schedule(static)
-        for (k = ixs; k<m-ixs; k++){
-            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
-                    - aw[k-ixs]*x[k-ixs];
+        for (k = 0; k<m; k++){
+            r[k] = f[k] - as[k]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
+                    - aw[k]*x[k-ixs];
 
             tmp = fabs(r[k]);
-            if (rnorm > tmp)
+            if (rnorm < tmp)
 #pragma omp critical
-                if (rnorm > tmp)
+                if (rnorm < tmp)
                     rnorm = tmp;
 
             //rnorm = maxd(rnorm, r[k], tmp);
         }
-
-        for (k = m-ixs; k<m-1; k++){
-            r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - aw[k-ixs]*x[k-ixs];
-            maxd(rnorm, r[k], tmp);
-        }
-
-        k = m-1;
-        r[k] = f[k] - as[k-1]*x[k-1] - ap[k]*x[k] - aw[k-ixs]*x[k-ixs];
-        maxd(rnorm, r[k], tmp);
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
@@ -467,32 +422,17 @@ void MINCORR_omp(double* ap, double* an, double* as, double* ae, double* aw,
 
     //computing Aw = A*corr and dot product (Aw, corr)
         dp_Aw_corr = 0;
-        Aw[0] = ap[0]*corr[0] + an[0]*corr[1] + ae[0]*corr[ixs];
-        dp_Aw_corr += Aw[0]*corr[0];
-        for (k = 1; k<ixs; k++){
-            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs];
-            dp_Aw_corr += Aw[k]*corr[k];
-        }
 
 #pragma omp parallel for shared(Aw, as, ap, an, ae, aw, corr) \
     firstprivate(ixs, m) private(k) \
     schedule(static) \
     reduction(+:dp_Aw_corr)
 
-        for (k = ixs; k<m-ixs; k++){
-            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
-                    + aw[k-ixs]*corr[k-ixs];
+        for (k = 0; k<m; k++){
+            Aw[k] = as[k]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
+                    + aw[k]*corr[k-ixs];
             dp_Aw_corr += Aw[k]*corr[k];
         }
-
-        for (k = m-ixs; k<m-1; k++){
-            Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + aw[k-ixs]*corr[k-ixs];
-            dp_Aw_corr += Aw[k]*corr[k];
-        }
-
-        k = m-1;
-        Aw[k] = as[k-1]*corr[k-1] + ap[k]*corr[k] + aw[k-ixs]*corr[k-ixs];
-        dp_Aw_corr += Aw[k]*corr[k];
 
     //computing dot product (iP*Aw; Aw) . maybe in same time with (Aw, corr) dot product
 

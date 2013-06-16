@@ -56,6 +56,7 @@ int omp_thread_count() {
     return n;
 }
 
+
 SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
                                  int I, int J, int &maxit){
     double h1 = test.a / (I-1), h2 = test.b / (J-1);
@@ -101,10 +102,10 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     int ixs = I-2;
 
     double* ap = new double[n];
-    double* as = new double[n-1];
-    double* an = new double[n-1];
-    double* ae = new double[n-ixs];
-    double* aw = new double[n-ixs];
+    double* as = new double[n];
+    double* an = new double[n];
+    double* ae = new double[n];
+    double* aw = new double[n];
     double* f = new double[n];
     double* x_slv = new double[n];
     double **iP = new double*[n];
@@ -125,18 +126,28 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     SRWVector& tv = A.diag(0);
     for (int i = 0; i<n; i++)
         ap[i] = tv(i);
+
     tv = A.diag(1);
     for (int i = 0; i<(n-1); i++)
         an[i] = tv(i);
+    an[n-1] = 0;
+
     tv = A.diag(-1);
-    for (int i = 0; i<(n-1); i++)
-        as[i] = tv(i);
+    as[0] = 0;
+    for (int i = 1; i<n; i++)
+        as[i] = tv(i-1);
+
     tv = A.diag(ixs);
     for (int i = 0; i<(n-ixs); i++)
         ae[i] = tv(i);
+    for (int i = n-ixs; i<n; i++)
+        ae[i] = 0;
+
     tv = A.diag(-ixs);
-    for (int i = 0; i<(n-ixs); i++)
-        aw[i] = tv(i);
+    for (int i = 0; i<ixs; i++)
+        aw[i] = 0;
+    for (int i = ixs; i<n; i++)
+        aw[i] = tv(i-ixs);
 
     for (int i = 0; i<n; i++)
         f[i] = b(i);
@@ -168,8 +179,14 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     for (int i = 0; i<(n-1); i++)
         dy_u[i] = tv[i];
 
+    /*print(ap, n);
+    print(an, n);
+    print(as, n);
+    print(ae, n);
+    print(aw, n);*/
 
-    std::cout << omp_thread_count() << std::endl;
+
+    /*std::cout << omp_thread_count() << std::endl;
 
     omp_set_dynamic(0);
     omp_set_num_threads(omp_get_max_threads());
@@ -181,12 +198,12 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
 
     std::cout << "OMP_TIME =" << time << std::endl << std::endl;
 
-    std::cout << omp_thread_count() << std::endl;
+    std::cout << omp_thread_count() << std::endl;*/
 
 
 
 
-    /*Preconditioner& precond1 = *(new Preconditioner(A, 1, "SSOR"));
+    Preconditioner& precond1 = *(new Preconditioner(A, 1, "SSOR"));
     for (int i = 0; i<n; i++)
         for (int j = 0; j<n; j++)
             iP[i][j] = precond1.iP()(i, j);
@@ -197,7 +214,7 @@ SRWMatrix& solve_poiss_2D_square(Test2DPoissonSquareArea& test,
     MINCORR_opt(ap, an, as, ae, aw, f, x_slv, iP, r, corr, Aw, 1e-5, maxit, ixs, n);
 
     ctime = clock() - ctime;
-    std::cout << "ITERATIVE_SSOR = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;*/
+    std::cout << "ITERATIVE_SSOR = " <<  (double)ctime/CLOCKS_PER_SEC << std::endl<< std::endl;
 
 
 
