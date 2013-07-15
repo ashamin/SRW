@@ -49,6 +49,8 @@ protected:
   double* ae;
   /** West point of cross schema */
   double* aw;
+  /** Solve of matrix equation */
+  double* x;
 };
 
 #endif
