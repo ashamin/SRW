@@ -116,6 +116,8 @@ schedule(static)
     if (maxit == max_it_local)
       std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
   }
+  
+  delete tmp_v;
 
   return x;
 
