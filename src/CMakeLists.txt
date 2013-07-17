@@ -4,7 +4,7 @@ project(src)
 include_directories(lsolvers)
 
 add_executable(${PROJECT_NAME} main.cpp lsolvers/lsolver.h lsolvers/lsolver.cpp
-defs.h)
+defs.h lsolvers/minres5d.h lsolvers/minres5d.cpp lsolvers/minres5dOmpSSOR.h lsolvers/minres5dOmpSSOR.cpp)
 
 #install(TARGETS src RUNTIME DESTINATION bin)
 
