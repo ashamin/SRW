@@ -21,7 +21,7 @@ public:
  * \param d right part of matrix equation
  * \param n dimention of diagonal
  */
-void TDMA_opt(const double* a, const double* b, const double* c,
+void TDMA(const double* a, const double* b, const double* c,
               double* x, const double* d, int n);
 
 #endif
@@ -49,6 +49,8 @@ protected:
   double* ae;
   /** West point of cross schema */
   double* aw;
+  /** Solve of matrix equation */
+  double* x;
 };
 
 #endif
