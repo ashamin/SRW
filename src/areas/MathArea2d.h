@@ -1,6 +1,8 @@
 #ifndef MATHAREA_2D_H
 #define MATHAREA_2D_H
 
+#include "math.h"
+
 /** It's strongly recommended to add double a and b parameters
  * to class which will inherits this abstract class.
  * 
@@ -11,8 +13,8 @@
  */
 class MathArea2d{
 public:
-  double** formA(int n, double h1, double h2, int I) = 0;
-  double* formB(int n, double h1, double h2, int I, int J, double* x, double* y) = 0;
+  virtual void formA(int n, double h1, double h2, int I) = 0;
+  virtual void formB(int n, double h1, double h2, int I, int J, double* x, double* y) = 0;
   
   virtual double g1(double y) = 0;
   virtual double g2(double y) = 0;
