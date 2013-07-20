@@ -1,5 +1,12 @@
 #include "lsolver.h"
 
+/** TODO
+ * 1) rewrite TDMA 
+ * 2) check TDMA work 
+ * 3) check preconditioner forming
+ * 4) minres constructor
+ */
+
 void TDMA(const double *a, const double *b, const double *c,
               double *x, const double *d, int n)
 {
