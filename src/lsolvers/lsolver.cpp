@@ -1,7 +1,6 @@
 #include "lsolver.h"
 
 /** TODO
- * 1) rewrite TDMA 
  * 2) check TDMA work 
  * 3) check preconditioner forming
  * 4) minres constructor
@@ -18,13 +17,11 @@ void TDMA(const double *a, const double *b, const double *c,
   loc_c[0] = c[0] / b[0];
   loc_d[0] = d[0] / b[0];
 
-  for (i = 1; i<(n-1); i++){
-    tmp = b[0] - loc_c[i-1]*a[i-1];
+  for (i = 1; i<n; i++){
+    tmp = b[i] - loc_c[i-1]*a[i];
     loc_c[i] = c[i] / tmp;
-    loc_d[i] = (d[i] - loc_d[i-1]*a[i-1]) / tmp;
+    loc_d[i] = (d[i] - loc_d[i-1]*a[i]) / tmp;
   }
-
-  loc_d[n-1] = (d[n-1] - loc_d[n-2]*a[n-2]) / (b[n-1] - loc_c[n-2]*a[n-2]);
 
   x[n-1] = loc_d[n-1];
   for (i = n-2; i>=0; i--)
