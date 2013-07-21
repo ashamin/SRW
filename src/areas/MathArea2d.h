@@ -13,6 +13,18 @@
  */
 class MathArea2d{
 public:
+  
+  virtual double* getAp() = 0;
+  virtual double* getAn() = 0;
+  virtual double* getAs() = 0;
+  virtual double* getAe() = 0;
+  virtual double* getAw() = 0;
+  
+  virtual int getN() = 0;
+  
+  virtual int getI() = 0;
+  virtual int getJ() = 0;
+  
   virtual void formA(int n, double h1, double h2, int I) = 0;
   virtual void formB(int n, double h1, double h2, int I, int J, double* x, double* y) = 0;
   

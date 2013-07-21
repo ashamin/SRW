@@ -1,9 +1,44 @@
 #include "minres5dOmpSSOR.h"
 
-minres5dOmpSSOR::minres5dOmpSSOR()
+minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsilon, int maxit)
 {
-
+  ap = area->getAp();
+  an = area->getAn();
+  as = area->getAs();
+  ae = area->getAe();
+  aw = area->getAw();
+  
+  dx_d = precond->dx_d;
+  dx_l = precond->dx_l;
+  dx_u = precond->dx_u;
+  dy_d = precond->dy_d;
+  dy_l = precond->dy_l;
+  dy_u = precond->dy_u;
+  
+  this->epsilon = epsilon;
+  this->maxit = maxit;
+  
+  m = area->getN();
+  
+  x = new double[m];
+  corr = new double[m];
+  r = new double[m];
+  f = new double[m];
+  Aw = new double[m];
+  
+  ixs = area->getI() - 2;
 }
+
+double minres5dOmpSSOR::exec_time()
+{
+  return time;
+}
+
+int minres5dOmpSSOR::it_num()
+{
+  return maxit;
+}
+
 
 
 double* minres5dOmpSSOR::solve()
@@ -29,7 +64,6 @@ double* minres5dOmpSSOR::solve()
   double* Aw = this->Aw;
   
   double epsilon = this->epsilon;
-  int maxit = this->maxit;
   int ixs = this->ixs;
   int m = this->m; 
   
@@ -47,8 +81,15 @@ double* minres5dOmpSSOR::solve()
 
   // matrix always is square so we can split this way
   int n = sqrt(m), i, j, k = 0;
+  
+  omp_set_dynamic(0);
+  omp_set_num_threads(omp_get_max_threads());
 
+  time = omp_get_wtime();
+  
   while(maxit++ < max_it_local){
+    
+    //std::cout << maxit << std::endl;
 
     //computing r and norm(r)
     //r = f - A*x
@@ -100,9 +141,7 @@ reduction(+:dp_Aw_r, dp_Aw_Aw)
     //computing tau
     tau = dp_Aw_r / dp_Aw_Aw;
 
-    using namespace std;
-
-    cout << tau << endl;
+    std::cout << rnorm << std::endl;
 
     //computes new approximation of x
 #pragma omp parallel for shared(corr, x) \
@@ -116,6 +155,8 @@ schedule(static)
     if (maxit == max_it_local)
       std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
   }
+  
+  time = omp_get_wtime() - time;
   
   delete tmp_v;
 

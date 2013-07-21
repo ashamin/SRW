@@ -1,13 +1,15 @@
 #include "sampleArea2d.h"
 
-sampleArea2d::sampleArea2d(int n, int ixs, int I, int J)
+sampleArea2d::sampleArea2d(int I, int J)
 {
+  this->n = (I - 2)*(J - 2);
   this->ab = 1;
   this->bb = 1;
   // here some integer parameter from [16; 20]
   this->p = 19;
   
-  this->ixs = ixs;
+  this->I = I;
+  this->J = J;
   
   x = new double[n];
   y = new double[n];
@@ -31,6 +33,47 @@ sampleArea2d::sampleArea2d(int n, int ixs, int I, int J)
   this->formA(n, h1, h2, I);
   this->formB(n, h1, h2, I, J, x, y);
 }
+
+double* sampleArea2d::getAp()
+{
+  return ap;
+}
+
+double* sampleArea2d::getAn()
+{
+  return an;
+}
+
+double* sampleArea2d::getAs()
+{
+  return as;
+}
+
+double* sampleArea2d::getAe()
+{
+  return ae;
+}
+
+double* sampleArea2d::getAw()
+{
+  return aw;
+}
+
+int sampleArea2d::getN()
+{
+  return n;
+}
+
+int sampleArea2d::getI()
+{
+  return I;
+}
+
+int sampleArea2d::getJ()
+{
+  return J;
+}
+
 
 void sampleArea2d::formA(int n, double h1, double h2, int I)
 { 

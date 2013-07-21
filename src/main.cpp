@@ -1,39 +1,31 @@
 #include <iostream>
 
-#include "lsolvers/lsolver.h"
+#include "lsolvers/minres5dOmpSSOR.h"
 #include "defs.h"
+
+#include "precond/SSORpar.h"
+#include "areas/sampleArea2d.h";
 
 // temporary main file of srw project
 
-int main(int argc, char **argv) {
-    int n = 5;
-    double* l = new double[n];
-    double* u = new double[n];
-    double* m = new double[n];
-    double* d = new double[n];
-    double* x = new double[n];
-    
-    l[0] = 0;
-    for (int i = 0; i<n-1; i++){
-      l[i+1] = i+1;
-      u[i] = i;
-    }
-    u[n-1] = 0;
-    for (int i = 0; i<n; i++)
-      m[i] = i*2+3;
-    
-    for (int i = 0; i<n; i++)
-      d[i] = i+1.5;
-
-    for (int i = 0; i<n; i++)
-      x[i] = 0;
-    
-    TDMA(l, m, u, x, d, n);
-    
+int main(int argc, char **argv) { 
+  
     using namespace std;
+  
+    int I = 20, J= 20;
+    int n = (I- 2)*(J -2);
     
-    for (int i = 0; i<n; i++)
-      cout << x[i] << endl;
+  
+    sampleArea2d* area = new sampleArea2d(I, J);
+    SSORpar* precond = new SSORpar(1, n, area->h1);
+    minres5dOmpSSOR* solver = new minres5dOmpSSOR(area, precond, 1e-5, 10000);
+    solver->solve();
+    
+    cout << "OMP_TIME=" << solver->exec_time() << endl;
+    cout << "ITER_NUMBER=" << solver->it_num() << endl;
+    
+    cout << omp_thread_count() << endl;
+    
   
     std::cout << "Hello, srw!" << std::endl;
     return 0;

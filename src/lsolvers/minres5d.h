@@ -17,7 +17,7 @@ protected:
   double* corr;
   /** 5 diagonal matrix multiplied by correction */
   double* Aw;
-  /**  */
+  /** Precision */
   double epsilon;
   /** Max allowed iterations */
   int maxit;

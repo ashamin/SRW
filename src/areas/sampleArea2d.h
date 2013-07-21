@@ -6,7 +6,18 @@
 class sampleArea2d : public MathArea2d{
 public:
   
-  sampleArea2d(int n, int ixs, int I, int J);
+  sampleArea2d(int I, int J);
+  
+  virtual double* getAp();
+  virtual double* getAn();
+  virtual double* getAs();
+  virtual double* getAe();
+  virtual double* getAw();
+  
+  virtual int getN();
+  
+  virtual int getI();
+  virtual int getJ();
   
   virtual void formA(int n, double h1, double h2, int I);
   virtual void formB(int n, double h1, double h2, int I, int J, double* x, double* y);
@@ -44,6 +55,11 @@ public:
   //  2 from x_splits. so it's value that shows number of x_splits without splits
   //  near borders 
   int ixs;
+  
+  // size
+  int n;
+  
+  int I, J;
   
 private:
   int p;

@@ -1,8 +1,6 @@
 #include "lsolver.h"
 
 /** TODO
- * 2) check TDMA work 
- * 3) check preconditioner forming
  * 4) minres constructor
  */
 

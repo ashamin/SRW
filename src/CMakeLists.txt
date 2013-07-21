@@ -7,7 +7,8 @@ include_directories(precond)
 
 add_executable(${PROJECT_NAME} main.cpp lsolvers/lsolver.h lsolvers/lsolver.cpp
 defs.h lsolvers/minres5d.h lsolvers/minres5d.cpp lsolvers/minres5dOmpSSOR.h lsolvers/minres5dOmpSSOR.cpp
-areas/MathArea2d.h areas/MathArea2d.cpp areas/sampleArea2d.h areas/sampleArea2d.cpp)
+areas/MathArea2d.h areas/MathArea2d.cpp areas/sampleArea2d.h areas/sampleArea2d.cpp 
+precond/SSORpar.h precond/SSORpar.cpp)
 
 #install(TARGETS src RUNTIME DESTINATION bin)
 

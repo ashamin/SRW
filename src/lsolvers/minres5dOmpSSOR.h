@@ -2,6 +2,8 @@
 #define MINRES_5D_OMP_SSOR_H
 
 #include "minres5d.h"
+#include "MathArea2d.h"
+#include "SSORpar.h"
 #include "omp.h"
 
 #include <iostream>
@@ -10,8 +12,11 @@
 class minres5dOmpSSOR : public minres5d
 {
 public:
-  minres5dOmpSSOR();
+  minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsilon, int maxit);
   double* solve();
+  
+  double exec_time();
+  int it_num();
 
 private:
   /** Main diagonal of x related part of parallel tridiagonal SSOR preconditioner */
@@ -26,6 +31,11 @@ private:
   double* dy_l;
   /** Upper diagonal of y */
   double* dy_u;
+  
+  
+  /** Execution time */
+  double time; 
+  
 };
 
 #endif
