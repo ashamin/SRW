@@ -25,8 +25,8 @@ public:
   virtual int getI() = 0;
   virtual int getJ() = 0;
   
-  virtual void formA(int n, double h1, double h2, int I) = 0;
-  virtual void formB(int n, double h1, double h2, int I, int J, double* x, double* y) = 0;
+  virtual void formA() = 0;
+  virtual void formB() = 0;
   
   virtual double g1(double y) = 0;
   virtual double g2(double y) = 0;

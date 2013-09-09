@@ -30,8 +30,20 @@ sampleArea2d::sampleArea2d(int I, int J)
   for (int j = 0; j<J; j++)
     y[j] = j*h2;
   
-  this->formA(n, h1, h2, I);
-  this->formB(n, h1, h2, I, J, x, y);
+  this->formA();
+  this->formB();
+}
+
+sampleArea2d::~sampleArea2d(){
+  delete [] ap;
+  delete [] as;
+  delete [] an;
+  delete [] ae;
+  delete [] aw;
+
+  delete [] b;
+  delete [] x;
+  delete [] y;
 }
 
 double* sampleArea2d::getAp()
@@ -74,11 +86,10 @@ int sampleArea2d::getJ()
   return J;
 }
 
-
-void sampleArea2d::formA(int n, double h1, double h2, int I)
+void sampleArea2d::formA()
 { 
   for (int i = 0; i<n; i++)
-    ap[i] = -2/(h1*h1) + 2/(h2*h2);
+    ap[i] = -(2.0/(h1*h1) + 2.0/(h2*h2));
   
   for (int i = 0; i<n; i++)
     an[i] = as[i] = 1/(h1*h1);
@@ -97,7 +108,7 @@ void sampleArea2d::formA(int n, double h1, double h2, int I)
     
 }
 
-void sampleArea2d::formB(int n, double h1, double h2, int I, int J, double* x, double* y)
+void sampleArea2d::formB()
 {
   int k = 0;
 

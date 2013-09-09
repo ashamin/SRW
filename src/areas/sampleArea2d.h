@@ -7,7 +7,9 @@ class sampleArea2d : public MathArea2d{
 public:
   
   sampleArea2d(int I, int J);
-  
+
+  virtual ~sampleArea2d();
+    
   virtual double* getAp();
   virtual double* getAn();
   virtual double* getAs();
@@ -19,8 +21,8 @@ public:
   virtual int getI();
   virtual int getJ();
   
-  virtual void formA(int n, double h1, double h2, int I);
-  virtual void formB(int n, double h1, double h2, int I, int J, double* x, double* y);
+  virtual void formA();
+  virtual void formB();
   
   virtual double g1(double y);
   virtual double g2(double y);
