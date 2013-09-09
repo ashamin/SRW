@@ -21,6 +21,11 @@ minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsi
   m = area->getN();
   
   x = new double[m];
+
+  for (int i = 0; i<m; i++){
+    x[i] = (double)i/m;
+  }
+
   corr = new double[m];
   r = new double[m];
   f = new double[m];
@@ -105,8 +110,8 @@ schedule(static)
       tmp = fabs(r[k]);
       if (rnorm < tmp)
 #pragma omp critical
-      if (rnorm < tmp)
-	rnorm = tmp;
+        if (rnorm < tmp)
+          rnorm = tmp;
     }
 
     //parallel computing corr - correction on each step using tridiagonal matrix method

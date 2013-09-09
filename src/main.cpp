@@ -4,7 +4,7 @@
 #include "defs.h"
 
 #include "precond/SSORpar.h"
-#include "areas/sampleArea2d.h";
+#include "areas/sampleArea2d.h"
 
 // temporary main file of srw project
 
@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   
     using namespace std;
   
-    int I = 20, J= 20;
+    int I = 10, J= 10;
     int n = (I- 2)*(J -2);
     
   
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     cout << "ITER_NUMBER=" << solver->it_num() << endl;
     
     cout << omp_thread_count() << endl;
-    
+
   
     std::cout << "Hello, srw!" << std::endl;
     return 0;

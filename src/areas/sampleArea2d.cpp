@@ -130,12 +130,12 @@ double sampleArea2d::g3(double x)
 
 double sampleArea2d::g4(double x)
 {
-  return x + 3*x*x;
+  return 3*x*x - 9*x - 6;
 }
 
 double sampleArea2d::f(double x, double y)
 {
-  return x + 3*x*x;
+  return 2 + 2*M_PI*M_PI*(p-15)*sin(M_PI*x)*sin(M_PI*y);
 }
 
 double sampleArea2d::right_answer(double x, double y)
