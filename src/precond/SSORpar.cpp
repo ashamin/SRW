@@ -32,3 +32,12 @@ SSORpar::SSORpar(double w, int n, double h)
   }
   
 }
+
+SSORpar::~SSORpar(){
+  delete [] dx_d;
+  delete [] dx_l;
+  delete [] dx_u;
+  delete [] dy_d;
+  delete [] dy_l;
+  delete [] dy_u;
+}

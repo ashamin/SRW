@@ -85,9 +85,12 @@ gtest_main.a : gtest-all.o gtest_main.o
 sampleArea2d.o : $(SRC_DIR)/areas/sampleArea2d.h $(SRC_DIR)/areas/sampleArea2d.cpp $(GTEST_HEADERS)
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(SRC_DIR)/areas/sampleArea2d.cpp
 
+SSORpar.o : $(SRC_DIR)/precond/SSORpar.h $(SRC_DIR)/precond/SSORpar.cpp $(GTEST_HEADERS)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(SRC_DIR)/precond/SSORpar.cpp
+
 main.o : $(TESTING_DIR)/main.cpp \
 		$(GTEST_HEADERS) 
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(TESTING_DIR)/main.cpp
 
-SRW_testing : sampleArea2d.o main.o gtest_main.a
+SRW_testing : sampleArea2d.o SSORpar.o main.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

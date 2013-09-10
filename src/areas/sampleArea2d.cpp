@@ -104,8 +104,7 @@ void sampleArea2d::formA()
   for (int i = 0; i<ixs; i++)
     aw[i] = 0;
   for (int i = ixs; i<n; i++)
-    aw[i] = 1/(h2*h2);
-    
+    aw[i] = 1/(h2*h2); 
 }
 
 void sampleArea2d::formB()

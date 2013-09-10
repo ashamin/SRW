@@ -4,6 +4,7 @@
 class SSORpar{
 public:
   SSORpar(double w, int n, double h);
+  ~SSORpar();
   
   /** Diags of tridiagonal x-related matrix */
   double* dx_d;

@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     
   
     sampleArea2d* area = new sampleArea2d(I, J);
-    SSORpar* precond = new SSORpar(1, n, area->h1);
+    SSORpar* precond = new SSORpar(.4, n, area->h1);
     minres5dOmpSSOR* solver = new minres5dOmpSSOR(area, precond, 1e-5, 10000);
     solver->solve();
     
