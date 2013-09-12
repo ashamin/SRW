@@ -36,4 +36,13 @@ double* lSolver5d::solve()
 {
 }
 
+lSolver5d::~lSolver5d(){
+  delete [] ap;
+  delete [] an;
+  delete [] as;
+  delete [] ae;
+  delete [] aw;
+  delete [] x;
+}
+
 

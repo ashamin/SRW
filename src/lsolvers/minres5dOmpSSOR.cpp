@@ -2,7 +2,7 @@
 
 #include "stdlib.h"
 
-minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsilon, int maxit)
+minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, const double epsilon, const int maxit)
 {
   ap = area->getAp();
   an = area->getAn();
@@ -34,6 +34,12 @@ minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsi
   Aw = new double[m];
   
   ixs = area->getI() - 2;
+}
+
+minres5dOmpSSOR::~minres5dOmpSSOR(){
+  delete [] corr;
+  delete [] r;
+  delete [] Aw;
 }
 
 double minres5dOmpSSOR::exec_time()
@@ -151,7 +157,7 @@ reduction(+:dp_Aw_r, dp_Aw_Aw)
 #pragma omp parallel for shared(corr, x) \
 firstprivate(m, tau) private(k) \
 schedule(static)
-
+  
     for (k = 0; k<m; k++)
       x[k] += corr[k]*tau;
 
@@ -162,7 +168,7 @@ schedule(static)
   
   time = omp_get_wtime() - time;
   
-  delete tmp_v;
+  delete [] tmp_v;
 
   return x;
 

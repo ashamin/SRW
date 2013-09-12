@@ -9,6 +9,7 @@
 class lSolver{
 public:
   double* solve();
+  double exec_time();
 };
 
 /**
@@ -37,6 +38,7 @@ void TDMA(const double* a, const double* b, const double* c,
 class lSolver5d : public lSolver{
 public:
   double* solve();
+  virtual ~lSolver5d();
   
 protected:
   /** Center of cross schema */

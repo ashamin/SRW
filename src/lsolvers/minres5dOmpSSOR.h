@@ -12,10 +12,12 @@
 class minres5dOmpSSOR : public minres5d
 {
 public:
-  minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsilon, int maxit);
+  minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, const double epsilon, const int maxit);
+  virtual ~minres5dOmpSSOR();
+
   double* solve();
   
-  double exec_time();
+  virtual double exec_time();
   int it_num();
 
 private:
