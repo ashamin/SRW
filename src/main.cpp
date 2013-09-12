@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
   
     sampleArea2d* area = new sampleArea2d(I, J);
     SSORpar* precond = new SSORpar(.4, n, area->h1);
-    minres5dOmpSSOR* solver = new minres5dOmpSSOR(area, precond, 1e-5, 10000);
+    minres5dOmpSSOR* solver = new minres5dOmpSSOR(area, precond, 1e-5, 100000);
     solver->solve();
     
     cout << "OMP_TIME=" << solver->exec_time() << endl;
@@ -26,7 +26,5 @@ int main(int argc, char **argv) {
     
     cout << omp_thread_count() << endl;
 
-  
-    std::cout << "Hello, srw!" << std::endl;
     return 0;
 }

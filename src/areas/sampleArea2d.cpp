@@ -10,6 +10,8 @@ sampleArea2d::sampleArea2d(int I, int J)
   
   this->I = I;
   this->J = J;
+
+  ixs = I - 2;
   
   x = new double[n];
   y = new double[n];
@@ -71,6 +73,10 @@ double* sampleArea2d::getAw()
   return aw;
 }
 
+double* sampleArea2d::getF(){
+  return b;
+}
+
 int sampleArea2d::getN()
 {
   return n;
@@ -104,7 +110,7 @@ void sampleArea2d::formA()
   for (int i = 0; i<ixs; i++)
     aw[i] = 0;
   for (int i = ixs; i<n; i++)
-    aw[i] = 1/(h2*h2); 
+    aw[i] = 1/(h2*h2);
 }
 
 void sampleArea2d::formB()

@@ -15,6 +15,7 @@ public:
   virtual double* getAs();
   virtual double* getAe();
   virtual double* getAw();
+  virtual double* getF();
   
   virtual int getN();
   

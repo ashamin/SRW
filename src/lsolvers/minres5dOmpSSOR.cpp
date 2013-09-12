@@ -1,5 +1,7 @@
 #include "minres5dOmpSSOR.h"
 
+#include "stdlib.h"
+
 minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsilon, int maxit)
 {
   ap = area->getAp();
@@ -7,6 +9,7 @@ minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsi
   as = area->getAs();
   ae = area->getAe();
   aw = area->getAw();
+  f = area->getF();
   
   dx_d = precond->dx_d;
   dx_l = precond->dx_l;
@@ -28,7 +31,6 @@ minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, double epsi
 
   corr = new double[m];
   r = new double[m];
-  f = new double[m];
   Aw = new double[m];
   
   ixs = area->getI() - 2;
@@ -94,11 +96,10 @@ double* minres5dOmpSSOR::solve()
   
   while(maxit++ < max_it_local){
     
-    //std::cout << maxit << std::endl;
-
     //computing r and norm(r)
     //r = f - A*x
     rnorm = 0;
+
 
 #pragma omp parallel for shared(r, f, as, ap, an, ae, aw, x) \
 firstprivate(m, ixs) private(k, tmp) \
@@ -145,8 +146,6 @@ reduction(+:dp_Aw_r, dp_Aw_Aw)
 
     //computing tau
     tau = dp_Aw_r / dp_Aw_Aw;
-
-    std::cout << rnorm << std::endl;
 
     //computes new approximation of x
 #pragma omp parallel for shared(corr, x) \

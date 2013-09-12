@@ -19,6 +19,7 @@ public:
   virtual double* getAs() = 0;
   virtual double* getAe() = 0;
   virtual double* getAw() = 0;
+  virtual double* getF() = 0;
   
   virtual int getN() = 0;
   
