@@ -1,0 +1,1 @@
+add_library(SSORpar SSORpar.cpp SSORpar.h)

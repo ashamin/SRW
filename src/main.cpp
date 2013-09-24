@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "lsolvers/minres5dOmpSSOR.h"
+#include "minres5dOmpSSOR.h"
 #include "defs.h"
 
-#include "precond/SSORpar.h"
-#include "areas/sampleArea2d.h"
+#include "SSORpar.h"
+#include "sampleArea2d.h"
 
 // temporary main file of srw project
 
@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   
     using namespace std;
   
-    int I = 30, J= 30;
+    int I = 50, J= 50;
     int n = (I- 2)*(J -2);
     
   

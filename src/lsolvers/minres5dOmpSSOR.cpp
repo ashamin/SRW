@@ -2,7 +2,7 @@
 
 #include "stdlib.h"
 
-minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* area, SSORpar* precond, const double epsilon, const int maxit)
+minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* const area, const SSORpar* const precond, const double epsilon, const int maxit)
 {
   ap = area->getAp();
   an = area->getAn();
@@ -97,7 +97,7 @@ double* minres5dOmpSSOR::solve()
   
   omp_set_dynamic(0);
   omp_set_num_threads(omp_get_max_threads());
-
+  
   time = omp_get_wtime();
   
   while(maxit++ < max_it_local){

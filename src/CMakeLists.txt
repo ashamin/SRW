@@ -5,16 +5,18 @@ include_directories(lsolvers)
 include_directories(areas)
 include_directories(precond)
 
-add_executable(${PROJECT_NAME} main.cpp lsolvers/lsolver.h lsolvers/lsolver.cpp
-defs.h lsolvers/minres5d.h lsolvers/minres5d.cpp lsolvers/minres5dOmpSSOR.h lsolvers/minres5dOmpSSOR.cpp
-areas/MathArea2d.h areas/MathArea2d.cpp areas/sampleArea2d.h areas/sampleArea2d.cpp 
-precond/SSORpar.h precond/SSORpar.cpp)
-
 #install(TARGETS src RUNTIME DESTINATION bin)
 
 add_subdirectory(lsolvers)
 add_subdirectory(areas)
 add_subdirectory(precond)
+
+add_executable(${PROJECT_NAME} main.cpp lsolvers/lsolver.h lsolvers/lsolver.cpp lsolvers/minres5d.h lsolvers/minres5d.cpp 
+lsolvers/minres5dOmpSSOR.h lsolvers/minres5dOmpSSOR.cpp defs.h)
+
+target_link_libraries(${PROJECT_NAME} MathArea2d sampleArea2d)
+target_link_libraries(${PROJECT_NAME} SSORpar)
+#target_link_libraries(${PROJECT_NAME} lsolver minres5d minres5dOmpSSOR)
 
 FIND_PACKAGE( OpenMP REQUIRED)
 if(OPENMP_FOUND)
