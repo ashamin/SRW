@@ -95,8 +95,12 @@ double* minres5dOmpSSOR::solve()
   // matrix always is square so we can split this way
   int n = sqrt(m), i, j, k = 0;
   
+  int THREAD_NUM = omp_get_max_threads();
+
   omp_set_dynamic(0);
-  omp_set_num_threads(omp_get_max_threads());
+  omp_set_num_threads(THREAD_NUM);
+
+  double norms[THREAD_NUM];
   
   time = omp_get_wtime();
   
@@ -107,9 +111,10 @@ double* minres5dOmpSSOR::solve()
     //computing r and norm(r)
     //r = f - A*x
     rnorm = 0;
+    for (i = 0; i<THREAD_NUM; i++)
+      norms[i] = 0;
 
-
-#pragma omp parallel for shared(r, f, as, ap, an, ae, aw, x) \
+#pragma omp parallel for shared(r, f, as, ap, an, ae, aw, x, norms) \
 firstprivate(m, ixs) private(k, tmp) \
 schedule(static)
     for (k = 0; k<m; k++){
@@ -117,11 +122,11 @@ schedule(static)
 	      - aw[k]*x[k-ixs];
 
       tmp = fabs(r[k]);
-      if (rnorm < tmp)
-#pragma omp critical
-        if (rnorm < tmp)
-          rnorm = tmp;
+      if (*norms < tmp) *norms = tmp;
     }
+
+    for (i = 0; i<THREAD_NUM; i++)
+      if (rnorm < norms[i]) rnorm = norms[i];
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
