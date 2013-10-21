@@ -100,7 +100,9 @@ double* minres5dOmpSSOR::solve()
   
   time = omp_get_wtime();
   
-  while(maxit++ < max_it_local){
+  //while(maxit++ < max_it_local){
+  while (1){
+    maxit++;
     
     //computing r and norm(r)
     //r = f - A*x
@@ -141,7 +143,7 @@ schedule(static)
 firstprivate(ixs, m) private(k) \
 schedule(static) \
 reduction(+:dp_Aw_r, dp_Aw_Aw)
-
+  
     for (k = 0; k<m; k++){
       Aw[k] = as[k]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
 	    + aw[k]*corr[k-ixs];
@@ -162,8 +164,8 @@ schedule(static)
       x[k] += corr[k]*tau;
 
     if (rnorm < epsilon) break;
-    if (maxit == max_it_local)
-      std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
+    //if (maxit == max_it_local)
+    //  std::cout << "Iteration process obviously won't converge. \\n Try to increase \" maxit \" value" << std::endl;
   }
   
   time = omp_get_wtime() - time;

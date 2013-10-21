@@ -101,7 +101,13 @@ void sampleArea2d::formA()
     an[i] = as[i] = 1/(h1*h1);
   as[0] = 0;
   an[n-1] = 0;
-  
+
+  // fill north and south diags with zeros where it has values at borders
+  // it make convergence much faster due to removing redundant operations
+  for (int i = I-3; i<n; i+=I-2)
+    an[i] = as[i] = 0;
+
+  // same way add zeros to east and west diags
   for (int i = 0; i<n-ixs; i++)
     ae[i] = 1/(h2*h2);
   for (int i = n-ixs; i<n; i++)
