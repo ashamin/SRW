@@ -1,58 +1,69 @@
 #ifndef IMPLEXPL_BOUSS
 #define IMPLEXPL_BOUSS
 
-#include "minres5d.h"
-#include "MathArea2d.h"
-#include "SSORpar.h"
+#include "BArea.h"
 #include "omp.h"
 
 #include <iostream>
 #include "math.h"
 
-class implexplBouss : public minres5d
+namespace Boussinesq{
+
+// z ceiling and z floor
+double zc = 1, zf = 0;
+double mu1 = 1, mu2 = 2;
+double kx = 1, ky = 1;
+
+inline double mu(double H){
+	if (H >= zc) return mu1;
+	else return mu2;
+}
+
+inline double Tx(double H){
+	if (H >= zc) return kx*(zc - zf);
+	else if (H < zf) return 0;
+	else return kx*(H - zf);
+}
+
+inline double Ty(double H){
+	if (H >= zc) return ky*(zc - zf);
+	else if (H < zf) return 0;
+	else return ky*(H - zf);
+}
+
+class implexplBouss
 {
 public:
-	implexplBouss(MathArea2d* const area, const SSORpar* const precond, const double epsilon, const int maxit);
+	implexplBouss(BArea* area, const double epsilon, const int maxit);
 	virtual ~implexplBouss();
 
 	double* solve();
+
+	double* H;
+	double epsilon;
+	int maxit;
+	int n;
+
+	void formDiffOperators();
 	
-	virtual double exec_time();
+	double exec_time();
 	int it_num();
 
-private:
-
-	/** Center of cross schema */
-	double* ap_y;
-	/** South point of cross schema */
-	double* as_y;
-	/** North point of cross schema */
-	double* an_y;
-	/** East point of cross schema */
-	double* ae_y;
-	/** West point of cross schema */
-	double* aw_y;
-
-	double* xs;
-
-
-	/** Main diagonal of x related part of parallel tridiagonal SSOR preconditioner */
+	// diags of X differential operator
 	double* dx_d;
-	/** Lower diagonal of x */
 	double* dx_l;
-	/** Upper diagonal of x */
 	double* dx_u;
-	/** Main diagonal of y */
+
+	// diags of Y differentioal operator
 	double* dy_d;
-	/** Lower diagonal of y */
 	double* dy_l;
-	/** Upper diagonal of y */
 	double* dy_u;
-	
-	
-	/** Execution time */
-	double time; 
-	
+
+	//coefficient near time differential
+	double mu;
+
 };
+
+}
 
 #endif

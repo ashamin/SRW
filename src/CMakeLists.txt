@@ -12,9 +12,9 @@ add_subdirectory(areas)
 add_subdirectory(precond)
 
 add_executable(${PROJECT_NAME} main.cpp lsolvers/lsolver.h lsolvers/lsolver.cpp lsolvers/minres5d.h lsolvers/minres5d.cpp 
-lsolvers/minres5dOmpSSOR.h lsolvers/minres5dOmpSSOR.cpp defs.h)
+lsolvers/minres5dOmpSSOR.h lsolvers/minres5dOmpSSOR.cpp defs.h lsolvers/implexplBouss.h lsolvers/implexplBouss.cpp)
 
-target_link_libraries(${PROJECT_NAME} MathArea2d sampleArea2d)
+target_link_libraries(${PROJECT_NAME} MathArea2d sampleArea2d BArea)
 target_link_libraries(${PROJECT_NAME} SSORpar)
 #target_link_libraries(${PROJECT_NAME} lsolver minres5d minres5dOmpSSOR)
 

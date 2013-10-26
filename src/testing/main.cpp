@@ -23,7 +23,6 @@ protected:
 
 /*
 TODO:
-	2) add zeros to all diags
 	3) tests module stucture
     4) operation dx_l[i] = dx_u[i] = value - may be undefined result
     5) ASSERT_DOUBLE_EQ => ASSERT_NEAR 

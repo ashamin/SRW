@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   
     using namespace std;
   
-    int I = 50, J= 50;
+    int I = 90, J= 90;
     int n = (I- 2)*(J -2);
     
   
