@@ -14,7 +14,7 @@ double zc = 1, zf = 0;
 double mu1 = 1, mu2 = 2;
 double kx = 1, ky = 1;
 
-inline double mu(double H){
+inline double get_mu(double H){
 	if (H >= zc) return mu1;
 	else return mu2;
 }
@@ -43,11 +43,12 @@ public:
 	double epsilon;
 	int maxit;
 	int n;
-
-	void formDiffOperators();
 	
 	double exec_time();
 	int it_num();
+
+private:
+	void formDiffOperators();
 
 	// diags of X differential operator
 	double* dx_d;
@@ -60,7 +61,7 @@ public:
 	double* dy_u;
 
 	//coefficient near time differential
-	double mu;
+	double* mu;
 
 };
 

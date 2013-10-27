@@ -18,6 +18,7 @@ implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
     this->dy_d = new double[n];
     this->dy_l = new double[n];
     this->dy_u = new double[n];
+    this->mu = new double[n];
     formDiffOperators();
 }
 
@@ -30,6 +31,9 @@ void implexplBouss::formDiffOperators(){
     // here we also should insert zeros to lower and upper diags
 
     // what to do with H values on borders - add new array
+
+    // add all computations for dx and dy diags for i = [0, n-1] values
+    //      first and last rows of tridiagonal matrices
 
     dx_l[0] = dy_l[0] = dx_u[n-1] = dy_u[n-1] = 0;
 
@@ -46,6 +50,9 @@ void implexplBouss::formDiffOperators(){
     }
 
     // here must fix border values of H
+
+    for (int i = 0; i<n; i++)
+        mu[i] = get_mu(H[i]);
 }
 
 double* implexplBouss::solve(){
