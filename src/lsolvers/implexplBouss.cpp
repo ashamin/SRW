@@ -7,11 +7,13 @@ namespace Boussinesq{
 implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit){
     this->epsilon = epsilon;
     this->maxit = maxit;
-    this->n = (area->I-2)*(area->J-2);
+    this->xs = area->I-2;
+    this->ys = area->J-2;
+    this->n = xs*ys;
     this->H = new double[n];
-    for (int i = 0; i<area->I; i++)
-        for (int j = 0; j<area->J; j++)
-            H[j + area->J*i] = area->answer(area->hx*i, area->hy*j, 0);
+    for (int j = 0; j<ys; j++)
+        for (int i = 0; i<xs; i++)
+            H[i + xs*j] = area->answer(area->hx*i, area->hy*j, 0);
     this->dx_d = new double[n];
     this->dx_l = new double[n];
     this->dx_u = new double[n];
@@ -43,11 +45,12 @@ void implexplBouss::formDiffOperators(){
         dx_d[i] = dx_l[i]+dx_u[i];
     }
 
-    for (int i = 1; i<n-1; i++){
-        dy_l[i] = Ty((H[i-1] + H[i])/2);
-        dy_u[i] = Ty((H[i+1] + H[i])/2);
-        dy_d[i] = dy_l[i]+dy_u[i];
-    }
+    // must fix
+    // for (int i = 1; i<n-1; i++){
+    //     dy_l[i] = Ty((H[i-1] + H[i])/2);
+    //     dy_u[i] = Ty((H[i+1] + H[i])/2);
+    //     dy_d[i] = dy_l[i]+dy_u[i];
+    // }
 
     // here must fix border values of H
 

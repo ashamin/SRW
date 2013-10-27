@@ -63,6 +63,10 @@ private:
 	//coefficient near time differential
 	double* mu;
 
+	// corresponds to I-2 and J-2
+	// x - splits and y - splits
+	int xs, ys;
+
 };
 
 }
