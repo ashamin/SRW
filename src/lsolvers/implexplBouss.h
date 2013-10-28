@@ -39,16 +39,33 @@ public:
 
 	double* solve();
 
+	// whole H (with borders)
+	double** Hw;
+	// H only borders
+	double* Hb;
+	// H computation area
 	double* H;
+	
 	double epsilon;
 	int maxit;
+	// Hw vector legth
 	int n;
+	// H vector length
+	int m;
+	double* V;
 	
 	double exec_time();
 	int it_num();
 
+	BArea* area;
+
+	double* x;
+	double* y;
+
+	double t;
+
 private:
-	void formDiffOperators();
+	void prepareIteration();
 
 	// diags of X differential operator
 	double* dx_d;
@@ -66,6 +83,8 @@ private:
 	// corresponds to I-2 and J-2
 	// x - splits and y - splits
 	int xs, ys;
+
+	int I, J;
 
 };
 

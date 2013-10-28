@@ -5,56 +5,84 @@
 namespace Boussinesq{
 
 implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit){
+    this->area = area;
     this->epsilon = epsilon;
     this->maxit = maxit;
-    this->xs = area->I-2;
-    this->ys = area->J-2;
-    this->n = xs*ys;
-    this->H = new double[n];
-    for (int j = 0; j<ys; j++)
-        for (int i = 0; i<xs; i++)
-            H[i + xs*j] = area->answer(area->hx*i, area->hy*j, 0);
-    this->dx_d = new double[n];
-    this->dx_l = new double[n];
-    this->dx_u = new double[n];
-    this->dy_d = new double[n];
-    this->dy_l = new double[n];
-    this->dy_u = new double[n];
-    this->mu = new double[n];
-    formDiffOperators();
+    t = 0;
+
+    I = area->I;
+    J = area->J;
+    xs = I-2;
+    ys = J-2;
+    n = I*J;
+    m = xs*ys;
+
+    x = new double[n];
+    y = new double[n];
+    x[0] = y[0] = 0;
+    for (int i = 1; i<n; i++){
+        x[i] = x[i-1] + area->hx;
+        y[i] = y[i-1] + area->hy;
+    }
+
+    Hw = new double*[n];
+    Hb = new double[n-m];
+    H = new double[m];
+
+    for (int i = 0; i<I; i++)
+        Hw[i] = &Hb[i];
+    int iB = I;
+    for (int j = 1; j<J-1; j++){
+        Hw[I*j] = &Hb[iB++];
+        Hw[I-1 + I*j] = &Hb[iB++];
+    }
+    for (int i = 0; i<I; i++)
+        Hw[i + I*(J-1)] = &Hb[iB++];
+    int iH = 0;
+    for (int j = 1; j<J-1; j++)
+        for (int i = 1; i<I-1; i++)
+            Hw[i + I*j] = &H[iH++];
+
+    for (int j = 0; j<J; j++)
+        for (int i = 0; i<I; i++)
+            *Hw[i + I*j] = area->answer(x[i], y[j], 0);
+
+    V = new double[m];
+    dx_d = new double[m];
+    dx_l = new double[m];
+    dx_u = new double[m];
+    dy_d = new double[m];
+    dy_l = new double[m];
+    dy_u = new double[m];
+    mu = new double[m];
+    prepareIteration();
 }
 
 implexplBouss::~implexplBouss(){
 
 }
 
-void implexplBouss::formDiffOperators(){
+void implexplBouss::prepareIteration(){
+
+    // V function internal area values
+    for (int j = 1; j<J-1; j++)
+        for (int i = 1; i<I-1; i++)
+            V[i + I*j] = area->V(x[i], y[i], t);
+
     // here we form Tx, Ty and mu vaues on each step (parallel)
-    // here we also should insert zeros to lower and upper diags
+    int k = 0;
+    for (int j = I+1; j<=n-I-xs; j+=I)
+        for (int i = j; i<j+xs; i++){
+            dx_l[k] = Tx((*Hw[i-1] + *Hw[i])/2);
+            dx_u[k] = Tx((*Hw[i+1] + *Hw[i])/2);
+            dx_d[k] = dx_l[k]+dx_u[k];
+            dy_l[k] = Ty((*Hw[i-I] + *Hw[i])/2);
+            dy_u[k] = Ty((*Hw[i+J] + *Hw[i])/2);
+            dy_d[k] = dy_l[k]+dy_u[k];
+            k++;
+        }
 
-    // what to do with H values on borders - add new array
-
-    // add all computations for dx and dy diags for i = [0, n-1] values
-    //      first and last rows of tridiagonal matrices
-
-    dx_l[0] = dy_l[0] = dx_u[n-1] = dy_u[n-1] = 0;
-
-    for (int i = 1; i<n-1; i++){
-        dx_l[i] = Tx((H[i-1] + H[i])/2);
-        dx_u[i] = Tx((H[i+1] + H[i])/2);
-        dx_d[i] = dx_l[i]+dx_u[i];
-    }
-
-    // must fix
-    // for (int i = 1; i<n-1; i++){
-    //     dy_l[i] = Ty((H[i-1] + H[i])/2);
-    //     dy_u[i] = Ty((H[i+1] + H[i])/2);
-    //     dy_d[i] = dy_l[i]+dy_u[i];
-    // }
-
-    // here must fix border values of H
-
-    for (int i = 0; i<n; i++)
+    for (int i = 0; i<m; i++)
         mu[i] = get_mu(H[i]);
 }
 
