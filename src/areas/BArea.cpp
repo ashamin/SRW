@@ -1,10 +1,12 @@
 #include "BArea.h"
 
-BArea::BArea(double sizeX, double sizeY, int I, int J){
+BArea::BArea(double sizeX, double sizeY, double destTime, int I, int J, double T){
 	this->I = I;
 	this->J = J;
-	this->hx = sizeX / (I - 1);
-	this->hy = sizeY / (J - 1);
+	this->T = T;
+	hx = sizeX / (I - 1);
+	hy = sizeY / (J - 1);
+	dt = destTime / (T - 1);
 }
 
 double BArea::answer(double x, double y, double t){

@@ -2,6 +2,7 @@
 #define IMPLEXPL_BOUSS
 
 #include "BArea.h"
+#include "lsolver.h"
 #include "omp.h"
 
 #include <iostream>
@@ -45,6 +46,10 @@ public:
 	double* Hb;
 	// H computation area
 	double* H;
+	// approximation of H
+	double* Ha;
+
+	double* b;
 	
 	double epsilon;
 	int maxit;
@@ -63,6 +68,7 @@ public:
 	double* y;
 
 	double t;
+	double dt;
 
 private:
 	void prepareIteration();
