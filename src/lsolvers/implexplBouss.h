@@ -40,6 +40,9 @@ public:
 
 	double* solve();
 
+	double borderValue(double x, double y, double t);
+	void recomputeBorderValues();
+
 	// whole H (with borders)
 	double** Hw;
 	// H only borders

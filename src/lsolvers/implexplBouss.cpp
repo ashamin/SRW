@@ -58,15 +58,33 @@ implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
     dy_l = new double[m];
     dy_u = new double[m];
     mu = new double[m];
-    prepareIteration();
 }
-
+    
 implexplBouss::~implexplBouss(){
 
 }
 
+double implexplBouss::borderValue(double x, double y, double t){
+    area->answer(x, y, t);
+}
+
+void implexplBouss::recomputeBorderValues(){
+    for (int i = 0; i<I; i++)
+        Hb[i] = borderValue(x[i], y[i], t);
+
+    for (int i = I; i<=n-I; i+=I-1){
+        *Hw[i] = borderValue(x[i], y[i], t);
+        i++;
+        *Hw[i] = borderValue(x[i], y[i], t);
+    }
+
+    for (int i = n-I+1; i<n; i++)
+        *Hw[i] = borderValue(x[i], y[i], t);
+}
+
 void implexplBouss::prepareIteration(){
 
+    recomputeBorderValues();
     // V function internal area values
     for (int j = 1; j<J-1; j++)
         for (int i = 1; i<I-1; i++)
@@ -95,40 +113,48 @@ double* implexplBouss::solve(){
     int s = sqrt(m);
 
 
-    prepareIteration();
+    while (true){
 
-    // explicit step
-    int k = 0;
-    for (int j = I+1; j<=n-I-xs; j+=I)
-        for (int i = j; i<j+xs; i++){
-            Ha[k] = (dx_l[k]**Hw[k-1] + dx_d[k]**Hw[k] + dx_u[k]**Hw[k+1] +
-                dy_l[k]**Hw[k-I] + dy_d[k]**Hw[k] + dy_u[k]**Hw[k+I] + V[k])/mu[k];
+        prepareIteration();
+
+        // explicit step
+        int k = 0;
+        for (int j = I+1; j<=n-I-xs; j+=I)
+            for (int i = j; i<j+xs; i++){
+                Ha[k] = (dx_l[k]**Hw[k-1] + dx_d[k]**Hw[k] + dx_u[k]**Hw[k+1] +
+                    dy_l[k]**Hw[k-I] + dy_d[k]**Hw[k] + dy_u[k]**Hw[k+I] + V[k])/mu[k];
+            }
+                
+
+        for (int i = 0; i<m; i++){
+            double tmp = mu[i] / dt;
+            dx_d[i] -= tmp;
+            dy_d[i] -= tmp;
+            b[i] = Ha[i]*tmp;
         }
-            
 
-    for (int i = 0; i<m; i++){
-        double tmp = mu[i] / dt;
-        dx_d[i] -= tmp;
-        dy_d[i] -= tmp;
-        b[i] = Ha[i]*tmp;
+        for (int i = 0; i<s; i++){
+            int k = i*s;
+            TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], s);
+        }
+
+        for (int i = 0; i<m; i++)
+            tmp_v[i] = -tmp_v[i] * mu[i] / dt;
+
+        for (int i = 0; i<s; i++){
+            int k = i*s;
+            TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &Ha[k], &tmp_v[k], s);
+        }
+
+        for (int i = 0; i<m; i++)
+            H[i] = H[i] + dt*Ha[i];
+
+        // add here break comdotion. norm of residual for example
+        break;
+
+        t += dt;
+
     }
-
-    for (int i = 0; i<s; i++){
-        int k = i*s;
-        TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], s);
-    }
-
-    for (int i = 0; i<m; i++)
-        tmp_v[i] = -tmp_v[i] * mu[i] / dt;
-
-    for (int i = 0; i<s; i++){
-        int k = i*s;
-        TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &Ha[k], &tmp_v[k], s);
-    }
-
-    for (int i = 0; i<m; i++)
-        H[i] = H[i] + dt*Ha[i];
-
 
     return H;
 }
