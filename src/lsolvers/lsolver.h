@@ -23,7 +23,7 @@ public:
  * \param n dimention of diagonal
  */
 void TDMA(const double* a, const double* b, const double* c,
-              double* x, const double* d, int n);
+              double* x, const double* d, const int n, double *loc_c, double *loc_d);
 
 #endif
 

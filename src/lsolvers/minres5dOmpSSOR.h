@@ -13,12 +13,16 @@ class minres5dOmpSSOR : public minres5d
 {
 public:
   minres5dOmpSSOR(MathArea2d* const area, const SSORpar* const precond, const double epsilon, const int maxit);
+  minres5dOmpSSOR(MathArea2d* const area, const SSORpar* const precond, const double epsilon, const int maxit, const int thread_num);
   virtual ~minres5dOmpSSOR();
 
   double* solve();
+  double* solve(const int thread_num);
   
   virtual double exec_time();
   int it_num();
+
+  int THREAD_NUM;
 
 private:
   /** Main diagonal of x related part of parallel tridiagonal SSOR preconditioner */
@@ -33,6 +37,9 @@ private:
   double* dy_l;
   /** Upper diagonal of y */
   double* dy_u;
+
+  double* loc_c;
+  double* loc_d;
   
   
   /** Execution time */

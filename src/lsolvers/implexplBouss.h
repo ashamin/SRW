@@ -11,9 +11,9 @@
 namespace Boussinesq{
 
 // z ceiling and z floor
-double zc = 1, zf = 0;
-double mu1 = 1, mu2 = 2;
-double kx = 1, ky = 1;
+const double zc = 1, zf = 0;
+const double mu1 = .1, mu2 = .2;
+const double kx = 1, ky = 1;
 
 inline double get_mu(double H){
 	if (H >= zc) return mu1;
@@ -85,6 +85,9 @@ private:
 	double* dy_d;
 	double* dy_l;
 	double* dy_u;
+
+	double* loc_c;
+	double* loc_d;
 
 	//coefficient near time differential
 	double* mu;

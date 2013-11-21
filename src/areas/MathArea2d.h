@@ -1,7 +1,8 @@
 #ifndef MATHAREA_2D_H
 #define MATHAREA_2D_H
 
-#include "math.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 /** It's strongly recommended to add double a and b parameters
  * to class which will inherits this abstract class.

@@ -6,4 +6,5 @@ minres5d::minres5d()
 
 double* minres5d::solve()
 {
+	return new double[1];
 }

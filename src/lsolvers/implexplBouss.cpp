@@ -2,6 +2,8 @@
 
 #include "stdlib.h"
 
+using namespace std;
+
 namespace Boussinesq{
 
 implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit){
@@ -58,6 +60,9 @@ implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
     dy_l = new double[m];
     dy_u = new double[m];
     mu = new double[m];
+
+	loc_c = new double[m];
+	loc_d = new double[m];
 }
     
 implexplBouss::~implexplBouss(){
@@ -65,7 +70,7 @@ implexplBouss::~implexplBouss(){
 }
 
 double implexplBouss::borderValue(double x, double y, double t){
-    area->answer(x, y, t);
+    return area->answer(x, y, t);
 }
 
 void implexplBouss::recomputeBorderValues(){
@@ -108,7 +113,7 @@ void implexplBouss::prepareIteration(){
 }
 
 double* implexplBouss::solve(){
-
+  
     double* tmp_v = new double[m];
     int s = sqrt(m);
 
@@ -121,10 +126,10 @@ double* implexplBouss::solve(){
         int k = 0;
         for (int j = I+1; j<=n-I-xs; j+=I)
             for (int i = j; i<j+xs; i++){
-                Ha[k] = (dx_l[k]**Hw[k-1] + dx_d[k]**Hw[k] + dx_u[k]**Hw[k+1] +
-                    dy_l[k]**Hw[k-I] + dy_d[k]**Hw[k] + dy_u[k]**Hw[k+I] + V[k])/mu[k];
+                Ha[k] = (dx_l[k]**Hw[i-1] + dx_d[k]**Hw[i] + dx_u[k]**Hw[i+1] +
+                    dy_l[k]**Hw[i-I] + dy_d[k]**Hw[i] + dy_u[k]**Hw[i+I] + V[k])/mu[k];
+                k++;
             }
-                
 
         for (int i = 0; i<m; i++){
             double tmp = mu[i] / dt;
@@ -135,7 +140,7 @@ double* implexplBouss::solve(){
 
         for (int i = 0; i<s; i++){
             int k = i*s;
-            TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], s);
+            TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], s, &loc_c[k], &loc_d[k]);
         }
 
         for (int i = 0; i<m; i++)
@@ -143,16 +148,20 @@ double* implexplBouss::solve(){
 
         for (int i = 0; i<s; i++){
             int k = i*s;
-            TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &Ha[k], &tmp_v[k], s);
+            TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &Ha[k], &tmp_v[k], s, &loc_c[k], &loc_d[k]);
         }
 
         for (int i = 0; i<m; i++)
             H[i] = H[i] + dt*Ha[i];
 
         // add here break comdotion. norm of residual for example
-        break;
+        
+        for (int i = 0; i<m; i++)
+            std::cout << H[i] << std::endl;
 
         t += dt;
+
+        break;
 
     }
 
