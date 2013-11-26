@@ -15,16 +15,17 @@ int main(int argc, char **argv) {
   
     using namespace std;
   
-    int I = 100, J= 100, T = 2;
+    int I = 10, J= 10, T = 2;
     int n = (I- 2)*(J -2);
 
-    // using namespace Boussinesq;
+    using namespace Boussinesq;
     
-    // BArea* area = new BArea(1, 1, 1, 4, 4, 2);
-    // implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
-    // solver->solve();
+    BArea* area		      = new BArea(1, 1, 1, 4, 4, 2);
+    implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
+    
+	solver->solve();
   
-    sampleArea2d* area = new sampleArea2d(I, J);
+    /*sampleArea2d* area = new sampleArea2d(I, J);
     SSORpar* precond = new SSORpar(.4, n, area->h1);
     minres5dOmpSSOR* solver = new minres5dOmpSSOR(area, precond, 1e-5, 100000);
     solver->solve(4);
@@ -32,7 +33,7 @@ int main(int argc, char **argv) {
     cout << "OMP_TIME=" << solver->exec_time() << endl;
     cout << "ITER_NUMBER=" << solver->it_num() << endl;
     
-    cout << omp_thread_count() << endl;
+    cout << omp_thread_count() << endl;*/
 
 	getchar();
 

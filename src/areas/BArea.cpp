@@ -10,9 +10,9 @@ BArea::BArea(double sizeX, double sizeY, double destTime, int I, int J, double T
 }
 
 double BArea::answer(double x, double y, double t){
-	return 1 + 2*t;
+	return 1 + 2*t*t;
 }
 
 double BArea::V(double x, double y, double t){
-	return x + y + t;
+	return 2*t;
 }
