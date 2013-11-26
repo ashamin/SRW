@@ -16,8 +16,8 @@ const double mu1 = 1, mu2 = 1;
 const double kx = 1, ky = 1;
 
 #define __get_mu(mu, H) (mu) = ((H) >= zc)?mu1:mu2;
-#define __Tx(ret, H) (ret) = ((H) >= zc)?kx*(zc - zf):(((H) < zf)?0:kx*(H - zf))
-#define __Ty(ret, H) (ret) = ((H) >= zc)?ky*(zc - zf):(((H) < zf)?0:ky*(H - zf))
+#define __Tx(ret, H) (ret) = ((H) >= zc)?kx*(zc - zf):(((H) < zf)?0:kx*((H) - zf))
+#define __Ty(ret, H) (ret) = ((H) >= zc)?ky*(zc - zf):(((H) < zf)?0:ky*((H) - zf))
 
 inline void log(char *name, double* var, int size)
 {
@@ -70,14 +70,6 @@ public:
 
 private:
 	void prepareIteration();
-	/*void log(char *name, double* var, int size)
-	{
-		std::cout << "RESULT__" << name << ':' << std::endl;
-		for (int i = 0; i<size; i++)
-			std::cout << var[i] << ' ';
-		std::cout << std::endl;
-	}*/
-
 
 	// diags of X differential operator
 	double* dx_d;

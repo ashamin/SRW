@@ -78,31 +78,31 @@ void implexplBouss::prepareIteration()
 	// TODO: initialize lower and upper squares. see diagram in notebook
     // here we form Tx, Ty and mu vaues on each step (parallel)
 
-	// что тут? I или не I
+	// what we need here I or not I?
 	for (int i = 1; i<I-1; i++) {
 		int k = i*I;
 		dx_l[k] = dx_d[k] = dy_l[k] = dy_d[k] = 0;
 		dx_u[k] = dy_u[k] = 1;
 
 		for (k = i*I+1; k<i*I+I-1; k++) {
-			__Tx(dx_l[k], 
-						(H[k-1] + H[k])
-						/2
-				);
-			__Tx(dx_u[k],
-						(H[k+1] + H[k])
-						/2
-				);
-			dx_d[k] = dx_l[k] + dx_u[k];
+            __Tx(dx_l[k], 
+                        (H[k-1] + H[k])
+                        /2
+            );
+            __Tx(dx_u[k],
+                        (H[k+1] + H[k])
+                        /2
+            );
+            dx_d[k] = dx_l[k] + dx_u[k];
 
-			__Ty(dy_l[k],
-						(H[k-I] + H[k])
-						/2
-				);
-			__Ty(dy_u[k], 
-						(H[k+I] + H[k])
-						/2
-				);
+            __Ty(dy_l[k],
+                        (H[k-I] + H[k])
+                        /2
+            );
+            __Ty(dy_u[k], 
+                        (H[k+I] + H[k])
+                        /2
+            );
 			dy_d[k] = dy_l[k] + dy_u[k];
 		}
 
@@ -132,11 +132,11 @@ double* implexplBouss::solve()
         int k = 0;
         for (k = I; k<=n-I; k++) {
                 Ha[k] = (
-						 dx_l[k]*H[k-1] + dx_d[k]*H[k] + dx_u[k]*H[k+1] +
-						 dy_l[k]*H[k-I] + dy_d[k]*H[k] + dy_u[k]*H[k+I] + 
-						 V[k]
-						) 
-						/ mu[k];
+                         dx_l[k]*H[k-1] + dx_d[k]*H[k] + dx_u[k]*H[k+1] +
+                         dy_l[k]*H[k-I] + dy_d[k]*H[k] + dy_u[k]*H[k+I] + 
+                         V[k]
+                        ) 
+                        / mu[k];
 		}
 
 
