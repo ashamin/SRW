@@ -151,11 +151,16 @@ schedule(static)
 #pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v, corr) \
 firstprivate(n) private(i, k) \
 schedule(static)
-
-    for (i = 0; i<n; i++){
+    for (i = 0; i<n; i++) {
         k = i*n;
-        TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &r[k], n, &loc_c[k], &loc_d[k]);
-        TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &corr[k], &tmp_v[k], n, &loc_c[k], &loc_d[k]);
+        TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &r[k], n, 1, &loc_c[k], &loc_d[k]);
+    }
+
+#pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v, corr) \
+firstprivate(n) private(i, k) \
+schedule(static)
+    for (k = 0; k<n; k++) {
+        TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &corr[k], &tmp_v[k], n, n, &loc_c[k], &loc_d[k]);
     }
 
     //computing Aw = A*r and dot products (Aw, r) and (Aw, Aw)

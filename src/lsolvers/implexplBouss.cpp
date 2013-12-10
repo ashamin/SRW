@@ -148,7 +148,7 @@ double* implexplBouss::solve()
 
         for (int i = 1; i<s-1; i++){
             int k = i*s;
-            TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], s, &loc_c[k], &loc_d[k]);
+            TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], s, 1, &loc_c[k], &loc_d[k]);
         }
 
         for (int i = I; i<n-I; i++) {
@@ -158,8 +158,7 @@ double* implexplBouss::solve()
 		}
 
         for (int i = 1; i<s-1; i++){
-            int k = i*s;
-            TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &Ha[k], &tmp_v[k], s, &loc_c[k], &loc_d[k]);
+            TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &Ha[k], &tmp_v[k], s, s, &loc_c[k], &loc_d[k]);
         }
 
 
