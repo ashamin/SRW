@@ -4,6 +4,14 @@
 class BArea{
 public:
 
+    /**
+     * @param sizeX размер по X
+     * @param sizeY размер по Y
+     * @param destTime время
+     * @param I количество разбиений по X
+     * @param J количество разбиений по Y
+     * @param T количество разбиений по времени
+     */
 	BArea(double sizeX, double sizeY, double destTime, int I, int J, double T);
 
 	double answer(double x, double y, double t);

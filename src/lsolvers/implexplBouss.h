@@ -19,12 +19,76 @@ const double kx = 1, ky = 1;
 #define __Tx(ret, H) (ret) = ((H) >= zc)?kx*(zc - zf):(((H) < zf)?0:kx*((H) - zf))
 #define __Ty(ret, H) (ret) = ((H) >= zc)?ky*(zc - zf):(((H) < zf)?0:ky*((H) - zf))
 
-inline void log(char *name, double* var, int size)
+/**
+ * вывод на консоль матрицы
+ */
+inline void log_matrix(char *name, double* var, int size)
 {
 	std::cout << "RESULT__" << name << ':' << std::endl;
-	for (int i = 0; i<size; i++)
-		std::cout << var[i] << ' ';
+    int sz = (int)sqrt(size);
+
+	for (int i = 0; i<sz; i++){
+        for (int j = 0; j<sz; j++)
+		    std::cout << var[i*sz + j] << ' ';
+            std::cout << std::endl;
+    }
 	std::cout << std::endl;
+}
+
+/**
+ * вывод на консоль вектора
+ */
+inline void log_vector(char *name, double* var, int size)
+{
+    std::cout << "RESULT__" << name << ':' << std::endl;
+    for (int i = 0; i<size; i++)
+        std::cout << var[i] << ' ';
+    std::cout << std::endl;
+}
+
+/**
+ * вывод на консоль трехдиагональной матрицы
+ *
+ * @param name имя
+ * @param lower нижняя диагональ
+ * @param main главная диагональ
+ * @param upper верхняя диагональ
+ */
+inline void log_diags_as_3dmatrix(char *name, 
+        double* lower, 
+        double* main, 
+        double* upper, int size)
+{
+    std::cout << "RESULT__" << name << ':' << std::endl;
+    int k = 0;
+    double eps = .00005;
+    int sz = (int)sqrt(size);
+    for (int i = 0; i<size; i++){
+        for (int j = 0; j<size; j++){
+            if (j == k-1)
+                std::cout << ((fabs(lower[k])>eps)?lower[k]:0);
+
+            else if (j == k)
+                std::cout << ((fabs(main[k])>eps)?main[k]:0);
+
+            else if (j == k+1)
+                std::cout << ((fabs(upper[k])>eps)?upper[k]:0);
+            else 
+                std::cout << 0;
+            std::cout << " ";
+            //vertical divider
+            if ((j+1)%sz==0) std::cout << "| ";
+        }
+        k++;
+        std::cout << std::endl;
+        // horizontal divider
+        if ((i+1)%sz==0){
+            for (int p = 0; p<size; p++)
+                std::cout << "___";
+            std::cout << std::endl;
+        }
+    }
+
 }
 
 class implexplBouss

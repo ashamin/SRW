@@ -23,13 +23,18 @@ minres5dOmpSSOR::minres5dOmpSSOR(MathArea2d* const area, const SSORpar* const pr
     
     m = area->getN();
     
-    x = new double[m];
+    x = new double[area->getI() * area->getJ()];
+    corr = new double[area->getI() * area->getJ()];
 
-    for (int i = 0; i<m; i++){
-    x[i] = (double)i/m;
+    for (int i = 0; i<area->getI(); i++)
+        x[i] = corr[i] = 0;
+    for (int i = area->getI(); i<area->getI()+m; i++){
+        x[i] = (double)i/m;
     }
+    for (int i = area->getI()+m; i<area->getI() * area->getJ(); i++)
+        x[i] = corr[i] = 0;
 
-    corr = new double[m];
+    
     r = new double[m];
     Aw = new double[m];
     
@@ -114,6 +119,7 @@ double* minres5dOmpSSOR::solve()
 
     // matrix always is square so we can split this way
     int n = sqrt(m), i, j, k = 0;
+    int I = ixs + 2;
 
     omp_set_dynamic(0);
     omp_set_num_threads(THREAD_NUM);
@@ -136,8 +142,8 @@ double* minres5dOmpSSOR::solve()
 firstprivate(m, ixs) private(k, tmp) \
 schedule(static)
     for (k = 0; k<m; k++){
-        r[k] = f[k] - as[k]*x[k-1] - ap[k]*x[k] - an[k]*x[k+1] - ae[k]*x[k+ixs]
-            - aw[k]*x[k-ixs];
+        r[k] = f[k] - as[k]*x[I + k-1] - ap[k]*x[I + k] - an[k]*x[I + k+1] - ae[k]*x[I + k+ixs]
+            - aw[k]*x[I + k-ixs];
 
         tmp = fabs(r[k]);
         if (*norms < tmp) *norms = tmp;
@@ -148,7 +154,7 @@ schedule(static)
 
     //parallel computing corr - correction on each step using tridiagonal matrix method
 
-#pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v, corr) \
+#pragma omp parallel for shared(dx_d, dx_l, dx_u, dy_d, dy_l, dy_u, r, tmp_v) \
 firstprivate(n) private(i, k) \
 schedule(static)
     for (i = 0; i<n; i++) {
@@ -160,7 +166,7 @@ schedule(static)
 firstprivate(n) private(i, k) \
 schedule(static)
     for (k = 0; k<n; k++) {
-        TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &corr[k], &tmp_v[k], n, n, &loc_c[k], &loc_d[k]);
+        TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &corr[I + k], &tmp_v[k], n, n, &loc_c[k], &loc_d[k]);
     }
 
     //computing Aw = A*r and dot products (Aw, r) and (Aw, Aw)
@@ -173,8 +179,8 @@ schedule(static) \
 reduction(+:dp_Aw_r, dp_Aw_Aw)
     
     for (k = 0; k<m; k++){
-        Aw[k] = as[k]*corr[k-1] + ap[k]*corr[k] + an[k]*corr[k+1] + ae[k]*corr[k+ixs]
-        + aw[k]*corr[k-ixs];
+        Aw[k] = as[k]*corr[I + k-1] + ap[k]*corr[I + k] + an[k]*corr[I + k+1] + ae[k]*corr[I + k+ixs]
+        + aw[k]*corr[I + k-ixs];
 
         dp_Aw_r += Aw[k]*r[k];
         dp_Aw_Aw += Aw[k]*Aw[k];
@@ -189,7 +195,7 @@ firstprivate(m, tau) private(k) \
 schedule(static)
     
     for (k = 0; k<m; k++)
-        x[k] += corr[k]*tau;
+        x[I + k] += corr[I + k]*tau;
 
     if (rnorm < epsilon) break;
     //if (maxit == max_it_local)

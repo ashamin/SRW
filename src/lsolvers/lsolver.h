@@ -13,14 +13,16 @@ public:
 };
 
 /**
- * Tridiagonal matrix algorithm. Solves tridiagonal matrix
- * with linear time.
- * \param a lower diagonal
- * \param b main diagonal
- * \param c upper diagonal 
- * \param x solve of system
- * \param d right part of matrix equation
- * \param n dimention of diagonal
+ * Прогонка
+ * @param a нижняя диагональ
+ * @param b главная диагональ
+ * @param c верхняя диагональ
+ * @param x вектор решения
+ * @param b вектор правой части
+ * @param n размерность вектора x
+ * @param step шаг (используется для того, чтобы прогонку можно было гнать по X и по Y)
+ * @param loc_c временный вектор
+ * @param loc_d временный вектор
  */
 void TDMA(const double* a, const double* b, const double* c,
               double* x, const double* d, int n, int step, double *loc_c, double *loc_d);
