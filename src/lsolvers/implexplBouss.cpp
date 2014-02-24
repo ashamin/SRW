@@ -15,7 +15,6 @@ implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
     t = 0;
     dt = area->dt;
 
-    // I, J - количество разбиений по X и по Y соответственно
     I = area->I;
     J = area->J;
     n = I*J;
@@ -68,33 +67,17 @@ void implexplBouss::recomputeBorderValues()
 void implexplBouss::prepareIteration()
 {
 
-    //
-    // пересчитываем функцию V на каждом шаге
     for (int j = 0; j<J; j++)
         for (int i = 0; i<I; i++)
             V[i + I*j] = area->V(x[i], y[i], t);
-
-    // здесь мы разбиваем трехдиагональную матрицу, на подматрицы
-    // линейные уравнения составленные из данных матриц будут решаться параллельно прогонкой.
-    //
-    // внешний цикл - берем квадрат матрицы 
-    // присваиваем значения 1, -1, 0 где это необходимо (граничные значения)
-    //
-    // внутренний цикл - рассчитываем коэффициены Tx Ty внутри области
-    //
     // here we form Tx, Ty and mu vaues on each step (parallel)
-	for (int i = 1; i<I-1; i++) {
-		int k = i*I;
-		dx_l[k] = dy_l[k] = 0;
+    for (int i = 1; i<I-1; i++) {
+        int k = i*I;
+        dx_l[k] = dy_l[k] = 0;
         dx_d[k] = dy_d[k] = 1;
-		dx_u[k] = dy_u[k] = -1;
+        dx_u[k] = dy_u[k] = -1;
 
-        // вычисляем диагонали матриц для прогонок по X и Y
-        // dx_l - нижняя диагональ тридиагональной матрицы для прогонки по X
-        // dx_d - главная диагональ
-        // dx_u - верхняя диагональ
-        // dy_l, dy_d, dy_u - те же диагонали, только для прогонки по Y
-		for (k = i*I+1; k<i*I+I-1; k++) {
+        for (k = i*I+1; k<i*I+I-1; k++) {
             __Tx(dx_l[k], 
                         (H[k-1] + H[k])
                         /2
@@ -103,7 +86,7 @@ void implexplBouss::prepareIteration()
                         (H[k+1] + H[k])
                         /2
             );
-            dx_d[k] = dx_l[k] + dx_u[k];
+            dx_d[k] = -dx_l[k] - dx_u[k];
 
             __Ty(dy_l[k],
                         (H[k-I] + H[k])
@@ -113,30 +96,29 @@ void implexplBouss::prepareIteration()
                         (H[k+I] + H[k])
                         /2
             );
-			dy_d[k] = dy_l[k] + dy_u[k];
-		}
+            dy_d[k] = -dy_l[k] - dy_u[k];
+        }
 
-        // на границе ставим нули. (всего 2 нуля. и пересчитываем главную диагональ) 
         k = i*I+1;
         dx_l[k] = dy_l[k] = 0;
-        dx_d[k] = dx_l[k] + dx_u[k];
-        dy_d[k] = dy_l[k] + dy_u[k];
+        dx_d[k] = -dx_l[k] - dx_u[k];
+        dy_d[k] = -dy_l[k] - dy_u[k];
         k = i*I+I-2;
         dx_u[k] = dy_u[k] = 0;
-        dx_d[k] = dx_l[k] + dx_u[k];
-        dy_d[k] = dy_l[k] + dy_u[k];
+        dx_d[k] = -dx_l[k] - dx_u[k];
+        dy_d[k] = -dy_l[k] - dy_u[k];
 
 
-		k = i * I + I - 1;
-		dx_l[k] = dy_l[k] = -1;
+        k = i * I + I - 1;
+        dx_l[k] = dy_l[k] = -1;
         dx_d[k] = dy_d[k] = 1;
-		dx_u[k] = dy_u[k] = 0;
+        dx_u[k] = dy_u[k] = 0;
 
-	}
+    }
     
-    // вычисляем значения мю, в каждой точке
+
     for (int i = 0; i<n; i++)
-		__get_mu(mu[i], H[i]);
+        __get_mu(mu[i], H[i]);
 
 }
 
@@ -149,14 +131,13 @@ double* implexplBouss::solve()
 
     while (true){
 
-        // вычисляем значения необходимые для произведения итерации
+
         prepareIteration();
-		
+
         log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n);
         log_vector("MU", mu, n);
         log_matrix("V", V, n);
 
-        // по явной схеме 
         int k = 0;
         for (k = I; k<=n-I; k++) {
                 Ha[k] = (
@@ -165,11 +146,11 @@ double* implexplBouss::solve()
                          V[k]
                         ) 
                         / mu[k];
-		}
+        }
 
         log_matrix("HA", Ha, n);
 
-        // неявная прогонка по X
+
         for (int i = I; i<n-I; i++) {
             double tmp = mu[i] / dt;
             dx_d[i] -= tmp;
@@ -186,12 +167,11 @@ double* implexplBouss::solve()
 
         log_matrix("TMP", tmp_v, n);
 
-        // неявная прогонка по Y
         for (int i = I; i<n-I; i++) {
-			double tmp = mu[i] / dt;
-			dy_d[i] -= tmp;
+            double tmp = mu[i] / dt;
+            dy_d[i] -= tmp;
             tmp_v[i] = -tmp_v[i] * tmp;
-		}
+        }
 
         for (int k = I+1; k<I+s-1; k++){
             TDMA(&dy_l[k], &dy_d[k], &dy_u[k], &Ha[k], &tmp_v[k], s-2, s, &loc_c[k], &loc_d[k]);
@@ -199,13 +179,11 @@ double* implexplBouss::solve()
 
         log_matrix("HA_TDMA", Ha, n);
 
-        // считаем поправку
         for (int i = I; i<n-I; i++)
             H[i] = H[i] + dt*Ha[i];
 
-		log_matrix("H", H, n);
+        log_matrix("H", H, n);
 
-        // изменяем текущее время
         t += dt;
 
         break;

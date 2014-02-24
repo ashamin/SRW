@@ -19,9 +19,6 @@ const double kx = 1, ky = 1;
 #define __Tx(ret, H) (ret) = ((H) >= zc)?kx*(zc - zf):(((H) < zf)?0:kx*((H) - zf))
 #define __Ty(ret, H) (ret) = ((H) >= zc)?ky*(zc - zf):(((H) < zf)?0:ky*((H) - zf))
 
-/**
- * вывод на консоль матрицы
- */
 inline void log_matrix(char *name, double* var, int size)
 {
 	std::cout << "RESULT__" << name << ':' << std::endl;
@@ -35,9 +32,6 @@ inline void log_matrix(char *name, double* var, int size)
 	std::cout << std::endl;
 }
 
-/**
- * вывод на консоль вектора
- */
 inline void log_vector(char *name, double* var, int size)
 {
     std::cout << "RESULT__" << name << ':' << std::endl;
@@ -46,14 +40,6 @@ inline void log_vector(char *name, double* var, int size)
     std::cout << std::endl;
 }
 
-/**
- * вывод на консоль трехдиагональной матрицы
- *
- * @param name имя
- * @param lower нижняя диагональ
- * @param main главная диагональ
- * @param upper верхняя диагональ
- */
 inline void log_diags_as_3dmatrix(char *name, 
         double* lower, 
         double* main, 

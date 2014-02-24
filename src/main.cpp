@@ -35,7 +35,5 @@ int main(int argc, char **argv) {
     
     cout << omp_thread_count() << endl;*/
 
-	getchar();
-
     return 0;
 }
