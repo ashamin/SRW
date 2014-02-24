@@ -1,6 +1,7 @@
 #include "implexplBouss.h"
 
 #include "stdlib.h"
+#include <cstring>
 
 using namespace std;
 
@@ -15,38 +16,54 @@ implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
     t = 0;
     dt = area->dt;
 
-    I = area->I;
-    J = area->J;
+    I = area->I + 2;
+    J = area->J + 2;
     n = I*J;
 
-    x = new double[n];
-    y = new double[n];
+    x = new double[area->I];
+    y = new double[area->J];
 
     x[0] = y[0] = 0;
-    for (int i = 1; i<n; i++){
+    for (int i = 1; i<area->I; i++)
         x[i] = x[i-1] + area->hx;
-        y[i] = y[i-1] + area->hy;
-    }
+    for (int j = 1; j<area->J; j++)
+        y[j] = y[j-1] + area->hy;
 
-    H	= new double[n];
-	Ha  = new double[n];
 
-    for (int j = 0; j<J; j++)
-        for (int i = 0; i<I; i++)
-            H[i + I*j] = area->answer(x[i], y[j], 0);
+    H   = new double[n];
+    Ha  = new double[n];
 
-    b	  = new double[n];
-    V	  = new double[n];
+    memset(H, 0, n*sizeof(double));
+    memset(Ha, 0, n*sizeof(double));
+
+    for (int j = 1; j<J-1; j++)
+        for (int i = 1; i<I-1; i++)
+            H[i + I*j] = area->answer(x[i-1], y[j-1], 0);
+
+    b     = new double[n];
+    V     = new double[n];
     dx_d  = new double[n];
     dx_l  = new double[n];
     dx_u  = new double[n];
     dy_d  = new double[n];
     dy_l  = new double[n];
     dy_u  = new double[n];
-    mu	  = new double[n];
+    mu    = new double[n];
 
-	loc_c = new double[n];
-	loc_d = new double[n];
+    loc_c = new double[n];
+    loc_d = new double[n];
+
+    memset(b, 0, n*sizeof(double));
+    memset(V, 0, n*sizeof(double));
+    memset(dx_d, 0, n*sizeof(double));
+    memset(dx_l, 0, n*sizeof(double));
+    memset(dx_u, 0, n*sizeof(double));
+    memset(dy_d, 0, n*sizeof(double));
+    memset(dy_l, 0, n*sizeof(double));
+    memset(dy_u, 0, n*sizeof(double));
+    memset(mu, 0, n*sizeof(double));
+    memset(loc_c, 0, n*sizeof(double));
+    memset(loc_d, 0, n*sizeof(double));
 }
     
 implexplBouss::~implexplBouss()
@@ -66,18 +83,19 @@ void implexplBouss::recomputeBorderValues()
 
 void implexplBouss::prepareIteration()
 {
+    // пересчитываем функцию V а каждом шаге
+    for (int j = 1; j<J-1; j++)
+        for (int i = 1; i<I-1; i++)
+            V[i + I*j] = area->V(x[i-1], y[i-1], t);
 
-    for (int j = 0; j<J; j++)
-        for (int i = 0; i<I; i++)
-            V[i + I*j] = area->V(x[i], y[i], t);
     // here we form Tx, Ty and mu vaues on each step (parallel)
-    for (int i = 1; i<I-1; i++) {
-        int k = i*I;
+    for (int j = 1; j<J-1; j++) {
+        int k = j*I + 1;
         dx_l[k] = dy_l[k] = 0;
         dx_d[k] = dy_d[k] = 1;
         dx_u[k] = dy_u[k] = -1;
 
-        for (k = i*I+1; k<i*I+I-1; k++) {
+        for (k = j*I+2; k<j*I+I-2; k++) {
             __Tx(dx_l[k], 
                         (H[k-1] + H[k])
                         /2
@@ -99,17 +117,20 @@ void implexplBouss::prepareIteration()
             dy_d[k] = -dy_l[k] - dy_u[k];
         }
 
-        k = i*I+1;
-        dx_l[k] = dy_l[k] = 0;
-        dx_d[k] = -dx_l[k] - dx_u[k];
-        dy_d[k] = -dy_l[k] - dy_u[k];
-        k = i*I+I-2;
-        dx_u[k] = dy_u[k] = 0;
-        dx_d[k] = -dx_l[k] - dx_u[k];
-        dy_d[k] = -dy_l[k] - dy_u[k];
+        // непонятно назначение данного участка кода.
+        //
+        // обнуляет влияние граничного значения на приграничное. и пересчитывает его
+        // с учетом только внутреннегзначения.
+//        k = i*I+1;
+//        dx_l[k] = dy_l[k] = 0;
+//        dx_d[k] = -dx_l[k] - dx_u[k];
+//        dy_d[k] = -dy_l[k] - dy_u[k];
+//        k = i*I+I-2;
+//        dx_u[k] = dy_u[k] = 0;
+//        dx_d[k] = -dx_l[k] - dx_u[k];
+//        dy_d[k] = -dy_l[k] - dy_u[k];
 
-
-        k = i * I + I - 1;
+        k = j * I + I - 2;
         dx_l[k] = dy_l[k] = -1;
         dx_d[k] = dy_d[k] = 1;
         dx_u[k] = dy_u[k] = 0;
@@ -126,7 +147,7 @@ double* implexplBouss::solve()
 {
   
     double* tmp_v = new double[n];
-    int s		  = (int)sqrt(n);
+    int s         = (int)sqrt(n);
 
 
     while (true){
@@ -139,7 +160,7 @@ double* implexplBouss::solve()
         log_matrix("V", V, n);
 
         int k = 0;
-        for (k = I; k<=n-I; k++) {
+        for (k = I+1; k<=n-I-1; k++) {
                 Ha[k] = (
                          dx_l[k]*H[k-1] + dx_d[k]*H[k] + dx_u[k]*H[k+1] +
                          dy_l[k]*H[k-I] + dy_d[k]*H[k] + dy_u[k]*H[k+I] + 
@@ -150,7 +171,7 @@ double* implexplBouss::solve()
 
         log_matrix("HA", Ha, n);
 
-
+        // неявная прогонка по X
         for (int i = I; i<n-I; i++) {
             double tmp = mu[i] / dt;
             dx_d[i] -= tmp;
@@ -167,6 +188,7 @@ double* implexplBouss::solve()
 
         log_matrix("TMP", tmp_v, n);
 
+        // неявная прогонка по Y
         for (int i = I; i<n-I; i++) {
             double tmp = mu[i] / dt;
             dy_d[i] -= tmp;
