@@ -19,8 +19,9 @@ int main(int argc, char **argv) {
     int n = (I- 2)*(J -2);
 
     using namespace Boussinesq;
-    
-    BArea* area		      = new BArea(1, 1, 1, 4, 4, 2);
+
+    //комментарий на русском. тест
+    BArea* area           = new BArea(1, 1, 1, 4, 4, 2);
     implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
     
 	solver->solve();
