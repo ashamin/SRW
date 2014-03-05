@@ -12,7 +12,8 @@ namespace Boussinesq{
 
 // z ceiling and z floor
 const double zc = 1, zf = 0;
-const double mu1 = 1, mu2 = 1;
+//const double mu1 = 1, mu2 = 1;
+const double mu1 = 0.1, mu2 = 0.1;
 const double kx = 1, ky = 1;
 
 #define __get_mu(mu, H) (mu) = ((H) >= zc)?mu1:mu2;

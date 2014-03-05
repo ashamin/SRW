@@ -14,5 +14,5 @@ double BArea::answer(double x, double y, double t){
 }
 
 double BArea::V(double x, double y, double t){
-    return 6*t;
+    return 0;
 }

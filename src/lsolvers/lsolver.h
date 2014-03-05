@@ -13,7 +13,7 @@ public:
 };
 
 void TDMA(const double* a, const double* b, const double* c,
-              double* x, const double* d, int n, int step, double *loc_c, double *loc_d);
+        double* x, const double* d, int n, int step, double *loc_c, double *loc_d);
 
 #endif
 

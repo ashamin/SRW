@@ -88,12 +88,12 @@ void implexplBouss::prepareIteration()
         for (int i = 1; i<I-1; i++)
             V[i + I*j] = area->V(x[i-1], y[i-1], t);
 
-    // here we form Tx, Ty and mu vaues on each step (parallel)
-    for (int j = 1; j<J-1; j++) {
+    // формируем Tx на каждом шаге
+    for (int j = 2; j<J-2; j++) {
         int k = j*I + 1;
-        dx_l[k] = dy_l[k] = 0;
-        dx_d[k] = dy_d[k] = 1;
-        dx_u[k] = dy_u[k] = -1;
+        dx_l[k] = 0;
+        dx_d[k] = 1;
+        dx_u[k] = -1;
 
         for (k = j*I+2; k<j*I+I-2; k++) {
             __Tx(dx_l[k], 
@@ -105,42 +105,44 @@ void implexplBouss::prepareIteration()
                         /2
             );
             dx_d[k] = -dx_l[k] - dx_u[k];
+        }
 
+        k = j * I + I - 2;
+        dx_l[k] = -1;
+        dx_d[k] = 1;
+        dx_u[k] = 0;
+
+    }
+
+    // формируем Ty на каждом шаге
+    for (int i = 2; i<I-2; i++) {
+        int k = i*J + 1;
+        dy_l[k] = 0;
+        dy_d[k] = 1;
+        dy_u[k] = -1;
+
+        for (k = i*J+2; k<i*J+J-2; k++) {
             __Ty(dy_l[k],
                         (H[k-I] + H[k])
                         /2
             );
-            __Ty(dy_u[k], 
+            __Ty(dy_u[k],
                         (H[k+I] + H[k])
                         /2
             );
             dy_d[k] = -dy_l[k] - dy_u[k];
         }
 
-        // непонятно назначение данного участка кода.
-        //
-        // обнуляет влияние граничного значения на приграничное. и пересчитывает его
-        // с учетом только внутреннегзначения.
-//        k = i*I+1;
-//        dx_l[k] = dy_l[k] = 0;
-//        dx_d[k] = -dx_l[k] - dx_u[k];
-//        dy_d[k] = -dy_l[k] - dy_u[k];
-//        k = i*I+I-2;
-//        dx_u[k] = dy_u[k] = 0;
-//        dx_d[k] = -dx_l[k] - dx_u[k];
-//        dy_d[k] = -dy_l[k] - dy_u[k];
-
-        k = j * I + I - 2;
-        dx_l[k] = dy_l[k] = -1;
-        dx_d[k] = dy_d[k] = 1;
-        dx_u[k] = dy_u[k] = 0;
-
+        k = i * J + J - 2;
+        dy_l[k] = -1;
+        dy_d[k] = 1;
+        dy_u[k] = 0;
     }
     
 
-    for (int i = 0; i<n; i++)
+    // вычисляем зачения mu на всей области (с буфером)
+    for (int i = I; i<n-I; i++)
         __get_mu(mu[i], H[i]);
-
 }
 
 double* implexplBouss::solve()
@@ -155,7 +157,9 @@ double* implexplBouss::solve()
 
         prepareIteration();
 
+        log_matrix("H", H, n);
         log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n);
+        log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n);
         log_vector("MU", mu, n);
         log_matrix("V", V, n);
 
@@ -167,9 +171,22 @@ double* implexplBouss::solve()
                          V[k]
                         ) 
                         / mu[k];
+                //            for (int p = 0; p<s-2; p++) {
+//                std::cout << dx_l[k] << "\t\t" << dx_d[k] << "\t\t" << dx_u[k] << "\t\t\t" << V[k] << "\t\t" << mu[k] << std::endl;
+//                std::cout << dy_l[k] << "\t\t" << dy_d[k] << "\t\t" << dy_u[k] << "\t\t\t" << V[k] << "\t\t" << mu[k] << std::endl;
+                //            }
         }
 
         log_matrix("HA", Ha, n);
+
+        // обнуляем элементы mu, находящиеся в области относящейся к буферу
+        //
+        // делаем это именно здесь из-за того, чтобы избежать NaN при делении на нулевое mu
+        // при вычислении Ha
+        for (int i = I; i<n; i+=I)
+            mu[i] = 0;
+        for (int i = I-1; i<=n; i+=I)
+            mu[i] = 0;
 
         // неявная прогонка по X
         for (int i = I; i<n-I; i++) {
@@ -184,6 +201,12 @@ double* implexplBouss::solve()
         for (int i = 1; i<s-1; i++){
             int k = i*s+1;
             TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], s-2, 1, &loc_c[k], &loc_d[k]);
+//            std::cout << std::endl << std::endl;
+//            std::cout << "dx_l" << "\t\t" << "dx_d" << "\t\t" << "dx_u" << "\t\t\t" << "b" << std::endl;
+//            for (int p = 0; p<s-2; p++) {
+//                std::cout << dx_l[k+p] << "\t\t" << dx_d[k+p] << "\t\t" << dx_u[k+p] << "\t\t\t" << b[k+p] << std::endl;
+//            }
+//            exit(1);
         }
 
         log_matrix("TMP", tmp_v, n);
@@ -215,4 +238,4 @@ double* implexplBouss::solve()
     return H;
 }
 
-}
+} // namespace Boussinesq
