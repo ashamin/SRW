@@ -212,7 +212,7 @@ double* implexplBouss::solve()
         log_matrix("TMP", tmp_v, n);
 
         // неявная прогонка по Y
-        for (int i = I; i<n-I; i++) {
+        for (int i = J; i<n-J; i++) {
             double tmp = mu[i] / dt;
             dy_d[i] -= tmp;
             tmp_v[i] = -tmp_v[i] * tmp;
