@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     using namespace Boussinesq;
 
     //комментарий на русском. тест
-    BArea* area           = new BArea(1, 1, 1, 4, 4, 2);
+    BArea* area           = new BArea(1, 1, 1, 6, 6, 50);
     implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
     
     solver->solve();
