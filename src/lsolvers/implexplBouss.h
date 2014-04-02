@@ -20,14 +20,13 @@ const double kx = 1, ky = 1;
 #define __Tx(ret, H) (ret) = ((H) >= zc)?kx*(zc - zf):(((H) < zf)?0:kx*((H) - zf))
 #define __Ty(ret, H) (ret) = ((H) >= zc)?ky*(zc - zf):(((H) < zf)?0:ky*((H) - zf))
 
-inline void log_matrix(char *name, double* var, int size)
+inline void log_matrix(char *name, double* var, int xSz, int ySz)
 {
 	std::cout << "RESULT__" << name << ':' << std::endl;
-    int sz = (int)sqrt(size);
 
-	for (int i = 0; i<sz; i++){
-        for (int j = 0; j<sz; j++)
-		    std::cout << var[i*sz + j] << ' ';
+    for (int j = 0; j<ySz; j++){
+        for (int i = 0; i<xSz; i++)
+            std::cout << var[j*xSz + i] << ' ';
             std::cout << std::endl;
     }
 	std::cout << std::endl;
@@ -44,12 +43,12 @@ inline void log_vector(char *name, double* var, int size)
 inline void log_diags_as_3dmatrix(char *name, 
         double* lower, 
         double* main, 
-        double* upper, int size)
+        double* upper, int size, int sz)
 {
     std::cout << "RESULT__" << name << ':' << std::endl;
     int k = 0;
     double eps = .00005;
-    int sz = (int)sqrt(size);
+   // int sz = (int)sqrt(size);
     for (int i = 0; i<size; i++){
         for (int j = 0; j<size; j++){
             if (j == k-1)
@@ -75,7 +74,6 @@ inline void log_diags_as_3dmatrix(char *name,
             std::cout << std::endl;
         }
     }
-
 }
 
 class implexplBouss

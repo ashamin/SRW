@@ -11,9 +11,11 @@ BArea::BArea(double sizeX, double sizeY, double destTime, int I, int J, double T
 }
 
 double BArea::answer(double x, double y, double t){
-    return cos(x*3.14159265359)*cos(y*3.14159265359);
+    return 1 + 3*t*t;
+//    return cos(x*3.14159265359)*cos(y*3.14159265359);
 }
 
 double BArea::V(double x, double y, double t){
-    return -2 * cos(x*3.14159265359)*cos(y*3.14159265359) * (3.14159265359*3.14159265359);
+    return 1;
+//    return -2 * cos(x*3.14159265359)*cos(y*3.14159265359) * (3.14159265359*3.14159265359);
 }
