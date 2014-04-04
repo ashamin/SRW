@@ -156,7 +156,6 @@ double* implexplBouss::solve()
 
     while (true){
 
-
         prepareIteration();
 
         log_matrix("H", H, I, J);
@@ -166,14 +165,17 @@ double* implexplBouss::solve()
         log_matrix("V", V, I, J);
 
         int k = 0;
-        for (k = I+1; k<=n-I-1; k++) {
-                Ha[k] = (
-                         dx_l[k]*H[k-1] + dx_d[k]*H[k] + dx_u[k]*H[k+1] +
-                         dy_l[k]*H[k-I] + dy_d[k]*H[k] + dy_u[k]*H[k+I] + 
-                         V[k]
-                        ) 
-                        / mu[k];
-        }
+        for (int i = 1; i < I - 1; i++)
+            for (int j = 1; j < J - 1; j++) {
+                int kT = i*J + j;
+                int kH = j*I + i;
+                Ha[kH] = (
+                         dx_l[kH]*H[kH-1] + dx_d[kH]*H[kH] + dx_u[kH]*H[kH+1] +
+                         dy_l[kT]*H[kH-I] + dy_d[kT]*H[kH] + dy_u[kT]*H[kH+I] +
+                         V[kH]
+                        )
+                        / mu[kH];
+         }
 
         log_matrix("HA", Ha, I, J);
 
@@ -187,11 +189,15 @@ double* implexplBouss::solve()
             mu[i] = 0;
 
         // неявная прогонка по X
-        for (int i = I; i<n-I; i++) {
-            double tmp = mu[i] / dt;
-            dx_d[i] -= tmp;
-            b[i] = - Ha[i] * tmp;
-        }
+//        for (int i = I; i<n-I; i++) {
+        for (int i = 2; i < I - 2; i++)
+            for (int j = 2; j < J - 2; j++) {
+                int k = j*I + i;
+                double tmp = mu[k] / dt;
+                dx_d[k] -= tmp;
+                b[k] = - Ha[k] * tmp;
+            }
+
 
         log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
         log_vector("B", b, n);
@@ -207,8 +213,8 @@ double* implexplBouss::solve()
         // возмонжо адресация mu должна быть по kT,
         //  а текущая ошибка по такой адресации из-за того, что mu заполнено не полностью
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -- скорее всего ошибка тут!!!!
-        for (int i = 1; i < I - 1; i++)
-            for (int j = 0; j < J; j++) {
+        for (int i = 2; i < I - 2; i++)
+            for (int j = 2; j < J - 2; j++) {
                 int kT = i*J + j;
                 int kH = j*I + i;
                 double tmp = mu[kH] / dt;
@@ -217,13 +223,17 @@ double* implexplBouss::solve()
         }
 
         log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
-        log_matrix("TMP", tmp_v, I, J);
+//        log_matrix("TMP", tmp_v, I, J);
+        log_vector("TMP_V", tmp_v, n);
+
+        log_matrix("HA_TDMA", Ha, I, J);
 
         // исправить это!
         for (int i = 2; i < I - 2; i++) {
             int kH = I + i;
             int kT = i*J+1;
-            TDMA(&dy_l[kT], &dy_d[kT], &dy_u[kT], &Ha[kH], &tmp_v[kH], J-2, J, &loc_c[kT], &loc_d[kT]);
+            TDMA_t(&dy_l[kT], &dy_d[kT], &dy_u[kT], &Ha[kH], &tmp_v[kH], J-2, I, &loc_c[kT], &loc_d[kT]);
+//            log_matrix("HA_TDMA", Ha, I, J);
         }
 
         log_matrix("HA_TDMA", Ha, I, J);

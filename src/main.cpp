@@ -9,6 +9,8 @@
 #include "BArea.h"
 #include "implexplBouss.h"
 
+
+#include <cmath>
 // temporary main file of srw project
 
 int main(int argc, char **argv) { 
@@ -21,7 +23,7 @@ int main(int argc, char **argv) {
     using namespace Boussinesq;
 
     //комментарий на русском. тест
-    BArea* area           = new BArea(1, 1, 1, 6, 4, 50);
+    BArea* area           = new BArea(1, 1, 1, 6, 6, 2);
     implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
     
     solver->solve();
@@ -36,5 +38,7 @@ int main(int argc, char **argv) {
     
 //    cout << omp_thread_count() << endl;
 
+    double x = .2, y = .2;
+    std::cout << -3.14159265359 * sin(3.14159265359*x) << std::endl;
     return 0;
 }
