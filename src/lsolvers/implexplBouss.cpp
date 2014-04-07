@@ -86,7 +86,7 @@ void implexplBouss::prepareIteration()
     // пересчитываем функцию V а каждом шаге
     for (int j = 1; j<J-1; j++)
         for (int i = 1; i<I-1; i++)
-            V[i + I*j] = area->V(x[i-1], y[i-1], t);
+            V[i + I*j] = area->V(x[i-1], y[j-1], t);
 
     // формируем Tx на каждом шаге
     for (int j = 2; j<J-2; j++) {
@@ -145,6 +145,13 @@ void implexplBouss::prepareIteration()
     // вычисляем зачения mu на всей области (с буфером)
     for (int i = I; i<n-I; i++)
         __get_mu(mu[i], H[i]);
+
+    // обнуляем элементы mu, находящиеся в области относящейся к буферу
+//    for (int i = I; i<n; i+=I)
+//        mu[i] = 0;
+//    for (int i = I-1; i<=n; i+=I)
+//        mu[i] = 0;
+
 }
 
 double* implexplBouss::solve()
@@ -178,15 +185,6 @@ double* implexplBouss::solve()
          }
 
         log_matrix("HA", Ha, I, J);
-
-        // обнуляем элементы mu, находящиеся в области относящейся к буферу
-        //
-        // делаем это именно здесь из-за того, чтобы избежать NaN при делении на нулевое mu
-        // при вычислении Ha
-        for (int i = I; i<n; i+=I)
-            mu[i] = 0;
-        for (int i = I-1; i<=n; i+=I)
-            mu[i] = 0;
 
         // неявная прогонка по X
 //        for (int i = I; i<n-I; i++) {
