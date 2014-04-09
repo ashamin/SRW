@@ -142,6 +142,8 @@ private:
 
 	int I, J;
 
+    int iterations;
+
 };
 
 }

@@ -14,7 +14,7 @@
 // temporary main file of srw project
 
 int main(int argc, char **argv) { 
-  
+
     using namespace std;
   
     int I = 100, J = 100, T = 2;
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     using namespace Boussinesq;
 
     //комментарий на русском. тест
-    BArea* area           = new BArea(1, 1, 1, 6, 6, 2);
+    BArea* area           = new BArea(1, 1, 1, 6, 6, 10);
     implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
     
     solver->solve();

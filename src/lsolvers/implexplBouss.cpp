@@ -64,6 +64,8 @@ implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
     memset(mu, 0, n*sizeof(double));
     memset(loc_c, 0, n*sizeof(double));
     memset(loc_d, 0, n*sizeof(double));
+
+    iterations = 0;
 }
     
 implexplBouss::~implexplBouss()
@@ -161,7 +163,7 @@ double* implexplBouss::solve()
     int s         = (int)sqrt(n);
 
 
-    while (true){
+    while (t<(area->dt*(area->T-1))){
 
         prepareIteration();
 
@@ -221,7 +223,7 @@ double* implexplBouss::solve()
         }
 
         log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
-//        log_matrix("TMP", tmp_v, I, J);
+
         log_vector("TMP_V", tmp_v, n);
 
         log_matrix("HA_TDMA", Ha, I, J);
@@ -231,7 +233,6 @@ double* implexplBouss::solve()
             int kH = I + i;
             int kT = i*J+1;
             TDMA_t(&dy_l[kT], &dy_d[kT], &dy_u[kT], &Ha[kH], &tmp_v[kH], J-2, I, &loc_c[kT], &loc_d[kT]);
-//            log_matrix("HA_TDMA", Ha, I, J);
         }
 
         log_matrix("HA_TDMA", Ha, I, J);
@@ -242,10 +243,13 @@ double* implexplBouss::solve()
         log_matrix("H", H, I, J);
 
         t += dt;
+        iterations++;
 
         break;
 
     }
+
+    std::cout << iterations << std::endl;
 
     return H;
 }
