@@ -16,9 +16,28 @@ const double zc = 1, zf = 0;
 const double mu1 = 1, mu2 = 1;
 const double kx = 1, ky = 1;
 
-#define __get_mu(mu, H) (mu) = ((H) >= zc)?mu1:mu2;
-#define __Tx(ret, H) (ret) = ((H) >= zc)?kx*(zc - zf):(((H) < zf)?0:kx*((H) - zf))
-#define __Ty(ret, H) (ret) = ((H) >= zc)?ky*(zc - zf):(((H) < zf)?0:ky*((H) - zf))
+inline void getMu(double* mu, double H)
+{
+    *mu = (H >= zc)?mu1:mu2;
+}
+
+inline void __Tx(double* ret, double H)
+{
+//    ret = (H >= zc)?kx*(zc - zf):((H < zf)?0:kx*(H - zf));
+    *ret = 1;
+}
+
+inline void __Ty(double* ret, double H)
+{
+//    ret = (H >= zc)?ky*(zc - zf):((H < zf)?0:ky*(H - zf));
+    *ret = 1;
+}
+
+//#define __get_mu(mu, H) (mu) = ((H) >= zc)?mu1:mu2;
+////#define __Tx(ret, H) (ret) = ((H) >= zc)?kx*(zc - zf):(((H) < zf)?0:kx*((H) - zf))
+//#define __Tx(ret, H) (ret) = 1//kx*(zc - zf)
+////#define __Ty(ret, H) (ret) = ((H) >= zc)?ky*(zc - zf):(((H) < zf)?0:ky*((H) - zf))
+//#define __Ty(ret, H) (ret) = 1//ky*(zc - zf)
 
 inline void log_matrix(char *name, double* var, int xSz, int ySz)
 {

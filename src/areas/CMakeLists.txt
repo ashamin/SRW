@@ -1,3 +1,13 @@
-add_library(MathArea2d MathArea2d.cpp MathArea2d.h)
-add_library(sampleArea2d sampleArea2d.cpp sampleArea2d.h)
-add_library(BArea BArea.cpp BArea.h)
+set(AREAS_H
+    ${CMAKE_CURRENT_SOURCE_DIR}/MathArea2d.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/BArea.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sampleArea2d.h
+PARENT_SCOPE
+)
+
+set(AREAS_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/MathArea2d.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/BArea.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sampleArea2d.cpp
+PARENT_SCOPE
+)

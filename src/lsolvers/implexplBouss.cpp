@@ -98,11 +98,11 @@ void implexplBouss::prepareIteration()
         dx_u[k] = -1;
 
         for (k = j*I+2; k<j*I+I-2; k++) {
-            __Tx(dx_l[k], 
+            __Tx(&dx_l[k],
                         (H[k-1] + H[k])
                         /2
             );
-            __Tx(dx_u[k],
+            __Tx(&dx_u[k],
                         (H[k+1] + H[k])
                         /2
             );
@@ -113,7 +113,6 @@ void implexplBouss::prepareIteration()
         dx_l[k] = -1;
         dx_d[k] = 1;
         dx_u[k] = 0;
-
     }
 
     // формируем Ty на каждом шаге
@@ -126,11 +125,11 @@ void implexplBouss::prepareIteration()
         for (int j = 2; j < J - 2; j++) {
             int kH = j*I+i;
             kT = i*J + j;
-            __Ty(dy_l[kT],
+            __Ty(&dy_l[kT],
                         (H[kH-I] + H[kH])
                         /2
             );
-            __Ty(dy_u[kT],
+            __Ty(&dy_u[kT],
                         (H[kH+I] + H[kH])
                         /2
             );
@@ -146,7 +145,7 @@ void implexplBouss::prepareIteration()
 
     // вычисляем зачения mu на всей области (с буфером)
     for (int i = I; i<n-I; i++)
-        __get_mu(mu[i], H[i]);
+        getMu(&mu[i], H[i]);
 
     // обнуляем элементы mu, находящиеся в области относящейся к буферу
 //    for (int i = I; i<n; i+=I)
@@ -170,8 +169,10 @@ double* implexplBouss::solve()
         log_matrix("H", H, I, J);
         log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
         log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
-        log_vector("MU", mu, n);
+//        log_vector("MU", mu, n);
         log_matrix("V", V, I, J);
+
+//        log_matrix("HA", Ha, I, J);
 
         int k = 0;
         for (int i = 1; i < I - 1; i++)
@@ -199,15 +200,15 @@ double* implexplBouss::solve()
             }
 
 
-        log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
-        log_vector("B", b, n);
+//        log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
+//        log_vector("B", b, n);
 
         for (int j = 2; j<J-2; j++){
             int k = j*I+1;
             TDMA(&dx_l[k], &dx_d[k], &dx_u[k], &tmp_v[k], &b[k], I-2, 1, &loc_c[k], &loc_d[k]);
         }
 
-        log_matrix("TMP", tmp_v, I, J);
+//        log_matrix("TMP", tmp_v, I, J);
 
         // неявная прогонка по Y
         // возмонжо адресация mu должна быть по kT,
@@ -222,11 +223,18 @@ double* implexplBouss::solve()
                 tmp_v[kH] = -tmp_v[kH] * tmp;
         }
 
-        log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
+//        log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
 
-        log_vector("TMP_V", tmp_v, n);
+//        log_vector("TMP_V", tmp_v, n);
 
-        log_matrix("HA_TDMA", Ha, I, J);
+//        log_matrix("HA_TDMA", Ha, I, J);
+
+        for (int i = 2; i< I -2; i++) {
+            int kH = I + i;
+            tmp_v[kH] = 0;
+            kH = (J-2)*I + i;
+            tmp_v[kH] =  0;
+        }
 
         // исправить это!
         for (int i = 2; i < I - 2; i++) {
@@ -235,6 +243,7 @@ double* implexplBouss::solve()
             TDMA_t(&dy_l[kT], &dy_d[kT], &dy_u[kT], &Ha[kH], &tmp_v[kH], J-2, I, &loc_c[kT], &loc_d[kT]);
         }
 
+//        log_vector("TMP_V", tmp_v, n);
         log_matrix("HA_TDMA", Ha, I, J);
 
         for (int i = I; i<n-I; i++)

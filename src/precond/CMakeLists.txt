@@ -1,1 +1,9 @@
-add_library(SSORpar SSORpar.cpp SSORpar.h)
+set(PRECOND_H
+    ${CMAKE_CURRENT_SOURCE_DIR}/SSORpar.h
+PARENT_SCOPE
+)
+
+set(PRECOND_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/SSORpar.cpp
+PARENT_SCOPE
+)
