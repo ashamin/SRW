@@ -21,16 +21,18 @@ inline void getMu(double* mu, double H)
     *mu = (H >= zc)?mu1:mu2;
 }
 
-inline void __Tx(double* ret, double H)
+inline double Tx(double H)
 {
 //    ret = (H >= zc)?kx*(zc - zf):((H < zf)?0:kx*(H - zf));
-    *ret = 1;
+    return 1;
 }
 
-inline void __Ty(double* ret, double H)
+
+
+inline double Ty(double H)
 {
 //    ret = (H >= zc)?ky*(zc - zf):((H < zf)?0:ky*(H - zf));
-    *ret = 1;
+    return 1;
 }
 
 //#define __get_mu(mu, H) (mu) = ((H) >= zc)?mu1:mu2;

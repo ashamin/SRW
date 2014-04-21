@@ -98,15 +98,11 @@ void implexplBouss::prepareIteration()
         dx_u[k] = -1;
 
         for (k = j*I+2; k<j*I+I-2; k++) {
-            __Tx(&dx_l[k],
-                        (H[k-1] + H[k])
-                        /2
-            );
-            __Tx(&dx_u[k],
-                        (H[k+1] + H[k])
-                        /2
-            );
-            dx_d[k] = -dx_l[k] - dx_u[k];
+            dx_l[k]  = Tx(H[k]) / (area->hx * area->hx) -
+                    (Tx(H[k+1]) - Tx(H[k-1]))/(2 * area->hx);
+            dx_u[k] = Tx(H[k]) / (area->hx * area->hx) +
+                    (Tx(H[k+1]) - Tx(H[k-1]))/(2 * area->hx);
+            dx_d[k] = -2 * Tx(H[k]) / (area->hx * area->hx);
         }
 
         k = j * I + I - 2;
@@ -125,15 +121,11 @@ void implexplBouss::prepareIteration()
         for (int j = 2; j < J - 2; j++) {
             int kH = j*I+i;
             kT = i*J + j;
-            __Ty(&dy_l[kT],
-                        (H[kH-I] + H[kH])
-                        /2
-            );
-            __Ty(&dy_u[kT],
-                        (H[kH+I] + H[kH])
-                        /2
-            );
-            dy_d[kT] = -dy_l[kT] - dy_u[kT];
+            dy_l[kT] = Ty(H[kH]) / (area->hx * area->hx) -
+                    (Ty(H[kH+I]) - Ty(H[kH-I])) / (2 * area->hx);
+            dy_u[kT] = Ty(H[kH]) / (area->hx * area->hx) +
+                    (Ty(H[kH+I]) - Ty(H[kH-I])) / (2 * area->hx);
+            dy_d[kT] = -2 * Tx(H[kH]) / (area->hx * area->hx);
         }
 
         kT = i*J + (J-2);
@@ -161,14 +153,15 @@ double* implexplBouss::solve()
     double* tmp_v = new double[n];
     int s         = (int)sqrt(n);
 
+    std::cout << std::endl << area->hx << std::endl << std::endl;
 
     while (t<(area->dt*(area->T-1))){
 
         prepareIteration();
 
         log_matrix("H", H, I, J);
-        log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
-        log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
+//        log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
+//        log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
 //        log_vector("MU", mu, n);
         log_matrix("V", V, I, J);
 
