@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     using namespace Boussinesq;
 
     //комментарий на русском. тест
-    BArea* area           = new BArea(1, 1, 1, 6, 6, 10);
+    BArea* area           = new BArea(0.1, 0.1, 1, 6, 6, 10);
     implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
     
     solver->solve();
