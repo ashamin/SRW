@@ -1,6 +1,8 @@
 #ifndef B_AREA
 #define B_AREA
 
+#include <string>
+
 class BArea{
 public:
     /**
@@ -13,6 +15,7 @@ public:
      * @param T количество разбиений по времени. определяет шаг по времени dt
      */
     BArea(double sizeX, double sizeY, double destTime, int I, int J, double T);
+    BArea(std::string file);
 
     double answer(double x, double y, double t);
 

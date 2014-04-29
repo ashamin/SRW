@@ -153,17 +153,24 @@ double* implexplBouss::solve()
     double* tmp_v = new double[n];
     int s         = (int)sqrt(n);
 
-    std::cout << std::endl << area->hx << std::endl << std::endl;
+
+    int tk = 17*I+324;
+//    std::cout << std::endl << area->hx << std::endl << std::endl;
+//    std::cout << std::endl << H[tk] << "\t";
+//    log_matrix("H", H, I, J);
 
     while (t<(area->dt*(area->T-1))){
 
         prepareIteration();
 
-        log_matrix("H", H, I, J);
+        if (iterations % 100 == 0)
+            std::cout << iterations << "\t" << H[tk] << "\t";
+
+//        log_matrix("H", H, I, J);
 //        log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
 //        log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
 //        log_vector("MU", mu, n);
-        log_matrix("V", V, I, J);
+//        log_matrix("V", V, I, J);
 
 //        log_matrix("HA", Ha, I, J);
 
@@ -180,7 +187,7 @@ double* implexplBouss::solve()
                         / mu[kH];
          }
 
-        log_matrix("HA", Ha, I, J);
+//        log_matrix("HA", Ha, I, J);
 
         // неявная прогонка по X
 //        for (int i = I; i<n-I; i++) {
@@ -237,21 +244,32 @@ double* implexplBouss::solve()
         }
 
 //        log_vector("TMP_V", tmp_v, n);
-        log_matrix("HA_TDMA", Ha, I, J);
+//        log_matrix("HA_TDMA", Ha, I, J);
 
-        for (int i = I; i<n-I; i++)
-            H[i] = H[i] + dt*Ha[i];
+        // кроме границ
+//        for (int i = I; i<n-I; i++)
+//            H[i] = H[i]+dt*Ha[i];
+        // не учитываем значения на границах. ГРАНИЦЫ КОНСТАНТНЫЕ! ИСПРАВИТЬ!
+        for (int i = 2; i < I - 2; i++)
+            for (int j = 2; j < J - 2; j++)
+            H[j*I + i] = H[j*I + i] + dt*Ha[j*I + i];
 
-        log_matrix("H", H, I, J);
+
+        if (iterations % 100 == 0)
+            std::cout << H[tk] << std::endl << std::endl;
+
+//        log_matrix("H", H, I, J);
 
         t += dt;
         iterations++;
 
-        break;
+//        break;
 
     }
 
-    std::cout << iterations << std::endl;
+
+
+//    std::cout << iterations << std::endl;
 
     return H;
 }

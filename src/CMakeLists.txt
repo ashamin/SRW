@@ -25,13 +25,14 @@ set(D_H
     ${AREAS_H}
     ${PRECOND_H}
     ${LSOLVERS_H}
+    ${GRAPHICS_H}
 )
 
 set(D_SRC
     ${AREAS_SRC}
     ${PRECOND_SRC}
-    ${GRAPHICS_SRC}
     ${LSOLVERS_SRC}
+    ${GRAPHICS_SRC}
 )
 
 add_executable(${PROJECT_NAME}
