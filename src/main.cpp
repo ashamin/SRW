@@ -24,8 +24,9 @@ int main(int argc, char **argv) {
 
     using namespace Boussinesq;
 
+    BArea* area = new BArea("xyz0.txt");
     //комментарий на русском. тест
-    BArea* area           = new BArea(1, 1, 1, 300, 300, 100000);
+//    BArea* area           = new BArea(1, 1, 1, 300, 300, 100000);
     implexplBouss* solver = new implexplBouss(area, 10e-5, 5);
     
     solver->solve();

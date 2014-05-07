@@ -11,10 +11,10 @@
 namespace Boussinesq{
 
 // z ceiling and z floor
-const double zc = 1, zf = 0;
+const double zc = 160, zf = 90;
 //const double mu1 = 1, mu2 = 1;
-const double mu1 = 1, mu2 = 1;
-const double kx = 1, ky = 1;
+const double mu1 = 0.16, mu2 = 0.16;
+const double kx = (double)1/(3600*24), ky = (double)1/(3600*24);
 
 inline void getMu(double* mu, double H)
 {
@@ -24,7 +24,8 @@ inline void getMu(double* mu, double H)
 inline double Tx(double H)
 {
 //    ret = (H >= zc)?kx*(zc - zf):((H < zf)?0:kx*(H - zf));
-    return 1;
+//    return 1;
+    return (H >= zc)?kx*(zc - zf):((H < zf)?0:kx*(H - zf));
 }
 
 
@@ -32,7 +33,8 @@ inline double Tx(double H)
 inline double Ty(double H)
 {
 //    ret = (H >= zc)?ky*(zc - zf):((H < zf)?0:ky*(H - zf));
-    return 1;
+//    return 1;
+    return (H >= zc)?ky*(zc - zf):((H < zf)?0:ky*(H - zf));
 }
 
 //#define __get_mu(mu, H) (mu) = ((H) >= zc)?mu1:mu2;

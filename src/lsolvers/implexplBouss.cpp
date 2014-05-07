@@ -10,6 +10,8 @@ namespace Boussinesq
 
 implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
 {
+
+
     this->area = area;
     this->epsilon = epsilon;
     this->maxit = maxit;
@@ -33,12 +35,16 @@ implexplBouss::implexplBouss(BArea* area, const double epsilon, const int maxit)
     H   = new double[n];
     Ha  = new double[n];
 
-    memset(H, 0, n*sizeof(double));
-    memset(Ha, 0, n*sizeof(double));
+//    memset(H, 0, n*sizeof(double));
+//    memset(Ha, 0, n*sizeof(double));
 
-    for (int j = 1; j<J-1; j++)
-        for (int i = 1; i<I-1; i++)
-            H[i + I*j] = area->answer(x[i-1], y[j-1], 0);
+//    for (int j = 1; j<J-1; j++)
+//        for (int i = 1; i<I-1; i++)
+//            H[i + I*j] = area->answer(x[i-1], y[j-1], 0);
+//    for (int i = 0; i<n; i++)
+//        H[i] = area->H[i];
+
+    H = area->H;
 
     b     = new double[n];
     V     = new double[n];
@@ -98,11 +104,16 @@ void implexplBouss::prepareIteration()
         dx_u[k] = -1;
 
         for (k = j*I+2; k<j*I+I-2; k++) {
-            dx_l[k]  = Tx(H[k]) / (area->hx * area->hx) -
-                    (Tx(H[k+1]) - Tx(H[k-1]))/(2 * area->hx);
-            dx_u[k] = Tx(H[k]) / (area->hx * area->hx) +
-                    (Tx(H[k+1]) - Tx(H[k-1]))/(2 * area->hx);
-            dx_d[k] = -2 * Tx(H[k]) / (area->hx * area->hx);
+//            if (k == 126)
+//                std::cout << "olol" << std::endl;
+//            dx_l[k]  = Tx(H[k]) / (area->hx * area->hx) -
+//                    (Tx((H[k+1] + H[k])/2) - Tx((H[k-1] + H[k])/2)) / (2 * area->hx);
+//            dx_u[k] = Tx(H[k]) / (area->hx * area->hx) +
+//                    (Tx((H[k+1] + H[k])/2) - Tx((H[k-1] + H[k])/2)) / (2 * area->hx);
+//            dx_d[k] = -2 * Tx(H[k]) / (area->hx * area->hx);
+            dx_l[k] = Tx((H[k-1] + H[k])/2) / (area->hx * area->hx);
+            dx_u[k] = Tx((H[k+1] + H[k])/2) / (area->hx * area->hx);
+            dx_d[k] = (-Tx((H[k+1] + H[k])/2) / area->hx - Tx((H[k-1] + H[k])/2) / area->hx) / area->hx;
         }
 
         k = j * I + I - 2;
@@ -121,11 +132,16 @@ void implexplBouss::prepareIteration()
         for (int j = 2; j < J - 2; j++) {
             int kH = j*I+i;
             kT = i*J + j;
-            dy_l[kT] = Ty(H[kH]) / (area->hx * area->hx) -
-                    (Ty(H[kH+I]) - Ty(H[kH-I])) / (2 * area->hx);
-            dy_u[kT] = Ty(H[kH]) / (area->hx * area->hx) +
-                    (Ty(H[kH+I]) - Ty(H[kH-I])) / (2 * area->hx);
-            dy_d[kT] = -2 * Tx(H[kH]) / (area->hx * area->hx);
+//            if (kT == 98)
+//                std::cout << "olol" << std::endl;
+//            dy_l[kT] = Ty(H[kH]) / (area->hy * area->hy) -
+//                    (Ty((H[kH+I] + H[kH])/2) - Ty((H[kH-I] + H[kH])/2)) / (2 * area->hy);
+//            dy_u[kT] = Ty(H[kH]) / (area->hy * area->hy) +
+//                    (Ty((H[kH+I] + H[kH])/2) - Ty((H[kH-I] + H[kH])/2)) / (2 * area->hy);
+//            dy_d[kT] = -2 * Tx(H[kH]) / (area->hy * area->hy);
+            dy_l[kT] = Ty((H[kH-I] + H[kH])/2) / (area->hy * area->hy);
+            dy_u[kT] = Ty((H[kH+I] + H[kH])/2) / (area->hy * area->hy);
+            dy_d[kT] =(-Ty((H[kH+I] + H[kH])/2) / area->hy - Ty((H[kH-I] + H[kH])/2) / area->hy) / area->hy;
         }
 
         kT = i*J + (J-2);
@@ -153,38 +169,56 @@ double* implexplBouss::solve()
     double* tmp_v = new double[n];
     int s         = (int)sqrt(n);
 
-
-    int tk = 17*I+324;
+//    int tk = 17*I+324;
+    int tk = 7*I + 12;
 //    std::cout << std::endl << area->hx << std::endl << std::endl;
 //    std::cout << std::endl << H[tk] << "\t";
 //    log_matrix("H", H, I, J);
+
 
     while (t<(area->dt*(area->T-1))){
 
         prepareIteration();
 
-        if (iterations % 100 == 0)
-            std::cout << iterations << "\t" << H[tk] << "\t";
+//        if (iterations % 100 == 0)
+//            std::cout << iterations << "\t" << H[tk] << "\t";
 
 //        log_matrix("H", H, I, J);
 //        log_diags_as_3dmatrix("DX", dx_l, dx_d, dx_u, n, I);
 //        log_diags_as_3dmatrix("DY", dy_l, dy_d, dy_u, n, J);
 //        log_vector("MU", mu, n);
 //        log_matrix("V", V, I, J);
-
 //        log_matrix("HA", Ha, I, J);
+
 
         int k = 0;
         for (int i = 1; i < I - 1; i++)
             for (int j = 1; j < J - 1; j++) {
                 int kT = i*J + j;
                 int kH = j*I + i;
-                Ha[kH] = (
+                Ha[kH] =(
                          dx_l[kH]*H[kH-1] + dx_d[kH]*H[kH] + dx_u[kH]*H[kH+1] +
                          dy_l[kT]*H[kH-I] + dy_d[kT]*H[kH] + dy_u[kT]*H[kH+I] +
                          V[kH]
                         )
                         / mu[kH];
+
+//                if (kH == 126) {
+//                    std::cout << "--------------------------------------------" << std::endl;
+//                    std::cout << dx_l[kH] << "\t" << dx_d[kH] << "\t" << dx_u[kH] << std::endl;
+//                    std::cout << dy_l[kT] << "\t" << dy_d[kT] << "\t" << dy_u[kT] << std::endl;
+//                    std::cout << V[kH] << std::endl;
+//                    std::cout << mu[kH] << std::endl;
+//                    std::cout << "--------------------------------------------" << std::endl;
+//                }
+
+//                if (H[kH] > 180){
+//                    std::cout << "AAAAAAAAAAAaa ------- " << kH << std::endl;
+//                    exit(0);
+//                }
+
+                if (kH == 437)
+                    std::cout << Ha[kH] << std::endl;
          }
 
 //        log_matrix("HA", Ha, I, J);
@@ -250,24 +284,33 @@ double* implexplBouss::solve()
 //        for (int i = I; i<n-I; i++)
 //            H[i] = H[i]+dt*Ha[i];
         // не учитываем значения на границах. ГРАНИЦЫ КОНСТАНТНЫЕ! ИСПРАВИТЬ!
+
+//        std::cout << iterations << "\t" <<H[126] << "\t" << Ha[126] << std::endl;
+
         for (int i = 2; i < I - 2; i++)
             for (int j = 2; j < J - 2; j++)
             H[j*I + i] = H[j*I + i] + dt*Ha[j*I + i];
 
 
-        if (iterations % 100 == 0)
-            std::cout << H[tk] << std::endl << std::endl;
+//        if (iterations % 100 == 0)
+//            std::cout << H[tk] << std::endl << std::endl;
 
 //        log_matrix("H", H, I, J);
 
         t += dt;
         iterations++;
+        if (iterations % 100 == 0)
+//            break;
+            std::cout << "IIIITeration --- " << iterations << std::endl;
+
 
 //        break;
 
     }
 
 
+//    std::cout << I << "\t" << J << std::endl;
+    log_matrix("Ha", H, I, J);
 
 //    std::cout << iterations << std::endl;
 
